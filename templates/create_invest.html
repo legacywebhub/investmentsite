@@ -6,6 +6,11 @@
 {% endblock %}
 
 {% block style %}
+<style>
+    .loading-gif {
+        width: 20px;
+    }
+</style>
 {% endblock %}
 
 {% block pagetitle %}
@@ -115,7 +120,7 @@
                                 <div>
                                     <p class='message error mb-2'></p>
                                     <div class='panel-footer text-center'>
-                                        <button type='submit' class='btn btn-primary'>Purchase Now!</button>
+                                        <button type='submit' class='btn btn-primary invest-button'><span class="btn-text">Purchase Now!</span></button>
                                     </div>
                                 </div>
 
@@ -212,7 +217,6 @@
             </div>
         </div>
     </div> -->
-
 </div>
 <!--pricing-contant 2-end-->
 {% endblock %}
@@ -222,8 +226,9 @@
     let investForms = document.getElementsByClassName('investment-form'),
     amounts = document.getElementsByClassName('amount');
 
-    console.log(investForms.length);
+    console.log("Number of forms: ", investForms.length);
 
+    // Code to calculate and display our profit and total returns on investment
     for (let i=0; i < amounts.length; i++) {
         amounts[i].addEventListener('keyup', function(){
             let amount = parseInt(amounts[i].value),
@@ -246,6 +251,7 @@
         })
     }
 
+    // Code to validate our forms and place investment
     for (let i=0; i < investForms.length; i++) {
         investForms[i].addEventListener('submit', function(e){
             e.preventDefault();
@@ -253,39 +259,56 @@
             let amount = parseInt(this.querySelector('.amount').value),
             payment = this.querySelector('.payment').value,
             package = parseInt(this.querySelector('.package').value),
-            // Package Information
+            // Package information
             packagePercentage = parseFloat(this.querySelector('.package-percentage').value),
             packageDuration = parseInt(this.querySelector('.package-duration').value),
             packageMin = parseInt(this.querySelector('.package-min').value),
             packageMax = parseInt(this.querySelector('.package-max').value),
             // Messages
             message = this.querySelector('.message'),
-            // Empty Form
+            // Submit button
+            investBtn = this.querySelector('.invest-button'),
+            // Empty form data
             investmentData;
 
+            console.log(investBtn.childEelment);
+
             if (amount < packageMin) {
+                // If amount is lesser than package minimum amount
                 message.innerText = `Minimum amount is ${packageMin}`;
             } else if (amount > packageMax) {
+                // If amount is greater than package minimum amount
                 message.innerText = `Maximum amount is ${packageMax}`;
+            } else if (isNaN(amount)) {
+                // If amount is not a number
+                message.innerText = `Please enter required fields`;
             } else if (payment == '' || payment == ' ') {
+                // If payment method is not picked
                 message.innerText = `Payment method is required`;
             } else {
+                // If form data is validated
                 investmentData  = {
                     'id': generateInvestmentID(),
                     'package': package,
                     'payment': payment,
                     'amount': amount
                 }
-                processInvestment(investmentData);
+                processInvestment(investmentData, message, investBtn);
             }
 
         });
     }
 
-    function processInvestment(data){
+    // AJAX function to send investment details to backend
+    function processInvestment(data, message, investButton) {
         var url = '/process_investment/'
 
+        // Loading animation
         console.log('About to send data...')
+        let btnText = investButton.querySelector('.btn-text');
+        btnText.innerHTML = `<img src="{% static 'assets/img/loading.gif' %}" class="loading-gif" alt="fetching...">`;
+        investButton.disabled = true;
+    
 
         fetch(url, {
             method: "POST",
@@ -299,11 +322,27 @@
             return response.json()
         })
         .then((data)=>{
-            console.log('data:', data)
-            window.location.href = 'invoice';
+            console.log(data)
+            if (data['status'] == 'success') {
+                message.style.color = 'rgba(5, 187, 5, 0.801)';
+                message.innerText = data['message'];
+                btnText.innerHTML = `Success`;
+                setTimeout(()=>{
+                    message.innerText = 'Redirecting to invoice page..';
+                    window.location.href = data['invoice-url'];
+                }, 5000)  
+            } else {
+                message.innerText = data['message'];
+                console.log(data['error-message'])
+                btnText.innerHTML = `Purchase Now!`;
+                investButton.disabled = false;
+            }
         })
         .catch((err)=>{
             console.log(err);
+            message.innerText = 'Error while placing investment. Try again later'
+            btnText.innerHTML = `Purchase Now!`;
+            investButton.disabled = false;
         })
     }
 
@@ -317,8 +356,9 @@
         // use  onkeypress="return onlyNumberKey(event)" on the input field
     }
 
+    // This function to generate investment ID
     function generateInvestmentID(){
-        let id = Math.floor(Math.random() * 1000000000 + 1)
+        let id = Math.floor(Math.random() * 1000000000 + 1);
 
         return id
     }

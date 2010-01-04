@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import *
 
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('name', 'balance', 'referral_bonus', 'total_balance')
+    list_display = ('name', 'balance', 'referral_balance', 'total_balance')
     list_filter = ()
     list_per_page = 20
 
@@ -17,15 +17,27 @@ class AccountAdmin(admin.ModelAdmin):
             name = obj.user.email
         return name
 
+
 class CompanyInfoAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'phone')
 
 
-class InvestmentAdmin(admin.ModelAdmin):
-    list_display = ('date', 'amount', 'package', 'payment_method', 'approved_date', 'end_date', 'status')
-    list_filter = ('date', 'package', 'payment_method', 'status',)
-    list_display_links = ('date', 'amount',)
+class DepositAdmin(admin.ModelAdmin):
+    list_display = ( 'date', 'user', 'amount')
+    list_display_links = ('date',)
     list_per_page = 20
+
+
+class InvestmentAdmin(admin.ModelAdmin):
+    list_display = ('date', 'user', 'package', 'amount', 'payment_method', 'approved_date', 'end_date', 'status', 'returns')
+    list_filter = ('date','user', 'package', 'payment_method', 'status',)
+    list_display_links = ('date', 'user', 'amount',)
+    list_per_page = 20
+
+    # Render filtered options only after 5 characters were entered
+    filter_input_length = {
+        "user": 3,
+    }
 
     def investor(self, obj):
         if obj.user.fullname:
@@ -46,9 +58,9 @@ class MessageAdmin(admin.ModelAdmin):
 
 
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('date', 'name')
+    list_display = ('date', 'name', 'message')
     list_filter = ('date',)
-    list_per_page = 30
+    list_per_page = 20
 
     def name(self, obj):
         if obj.user.fullname:
@@ -97,12 +109,6 @@ class ProfileAdmin(admin.ModelAdmin):
             return '-'
 
 
-class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('date', 'amount', 'type', 'payment_method', 'status')
-    list_display_links = ('date', 'amount',)
-    list_filter = ('date', 'type', 'status', 'payment_method',)
-    list_per_page = 20
-
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ( 'fullname', 'email',)
@@ -110,13 +116,22 @@ class UserAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
+
+class WithdrawAdmin(admin.ModelAdmin):
+    list_display = ('date', 'user', 'amount', 'payment_method', 'status')
+    list_display_links = ('date', 'user', 'amount',)
+    list_filter = ('date', 'user', 'status', 'payment_method',)
+    list_per_page = 20
+
+
 # Register your models here.
 admin.site.register(Account, AccountAdmin)
 admin.site.register(CompanyInfo, CompanyInfoAdmin)
+admin.site.register(Deposit)
 admin.site.register(Investment, InvestmentAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Package, PackageAdmin)
 admin.site.register(Profile, ProfileAdmin)
-admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(User, UserAdmin)
+admin.site.register(Withdraw, WithdrawAdmin)

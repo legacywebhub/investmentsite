@@ -2,12 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 import datetime, pytz
-from .utils import generateRefCode
-from asgiref.sync import sync_to_async
-import asyncio
-from .utils import runInvestmentProcess
+from .utils import generateRefCode, updateAccount
 
-loop = asyncio.get_event_loop()
 
 # Create your models here.
 
@@ -34,6 +30,9 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         # Saving user to database
         user.save(using=self._db)
+        # Creating welcome message For user
+        notification = Notification.objects.create(user=user, message=f'Hello {user.first_name}, Your account setup was successful. Create a mining package to start mining and earning')
+        notification.save()
         # Return user after saving
         return user
 
@@ -52,13 +51,12 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         # Return user after saving
         return user
+    
 
     '''
     Make sure to set this manager as the manager in your custom model
     objects = MyUserManager()
     '''
-
-
 
 
 
@@ -127,7 +125,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=False, blank=False)
     profile_pic = models.ImageField(upload_to="images/profiles", null=True, blank=True)
-    location = models.CharField(max_length=160, null=True, blank=True)
+    location = models.CharField(max_length=160, null=True, blank=True, help_text="country/state")
+    timezone = models.CharField(max_length=160, null=True, blank=True)
     ref_code = models.CharField(verbose_name="referral code", max_length=30, unique=True, null=True, blank=True)
     upline = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="upline", related_name="upline")
     downlines = models.ManyToManyField(User, verbose_name="referred", related_name="downlines", blank=True)
@@ -152,44 +151,53 @@ class Profile(models.Model):
         return name
 
 
+
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
-    balance = models.PositiveIntegerField(default=0, null=False)
-    referral_bonus = models.PositiveIntegerField(default=0, null=False)
+    balance = models.FloatField(default=0, null=False)
+    referral_balance = models.FloatField(default=0, null=False)
 
     @property
+    # Function to return TOTAL ACCOUNT BALANCE
+    def total_balance(self):
+        return self.balance + self.referral_balance
+
+    @property
+    # Function to return CURRENT ACTIVE/APPROVED INVESTMENTS' RETURNS
     def active_investments(self):
         investments = Investment.objects.filter(user=self.user, status='approved')
-        total = sum([item.amount for item in investments])
+        total = sum([item.returns for item in investments])
         return  total
 
     @property
+    # Function to return TOTAL AMOUNT OF ALL PENDING/UNAPPROVED INVESTMENTS
     def pending_investments(self):
         investments = Investment.objects.filter(user=self.user, status='pending')
         total = sum([item.amount for item in investments])
         return  total
 
     @property
+    # Function to return TOTAL RETURNS OF ACTIVE & COMPLETED INVESTMENTS
     def total_investments(self):
-        investments = Investment.objects.filter(user=self.user)
-        total = sum([item.amount for item in investments])
+        approved_investments = Investment.objects.filter(user=self.user, status='approved')
+        completed_investments = Investment.objects.filter(user=self.user, status='completed')
+        investments = list(approved_investments) + list(completed_investments)
+        total = sum([item.returns for item in investments])
         return  total
 
     @property
+    # Function to return TOTAL PENDING WITHDRAWALS
     def pending_withdrawals(self):
-        withdrawals = Transaction.objects.filter(user=self.user, status='pending')
+        withdrawals = Withdraw.objects.filter(user=self.user, status='pending')
         total = sum([item.amount for item in withdrawals])
         return  total
 
     @property
-    def total_withdrawals(self):
-        withdrawals = Transaction.objects.filter(user=self.user, status='completed')
+    # Function to return TOTAL COMPLETED WITHDRAWALS
+    def completed_withdrawals(self):
+        withdrawals = Withdraw.objects.filter(user=self.user, status='approved')
         total = sum([item.amount for item in withdrawals])
         return  total
-
-    @property
-    def total_balance(self):
-        return self.balance + self.referral_bonus
 
     def __str__(self):
         if self.user.fullname:
@@ -201,6 +209,7 @@ class Account(models.Model):
         else:
             name = ''
         return name
+
 
 
 class CompanyInfo(models.Model):
@@ -250,6 +259,7 @@ class CompanyInfo(models.Model):
             super().save(*args, **kwargs)
 
 
+
 class Package(models.Model):
     package = models.CharField(max_length=25, unique=True, blank=False, null=False)
     daily_profit_percentage = models.FloatField(blank=False, null=False, help_text="in percentage(%)")
@@ -280,6 +290,7 @@ class Package(models.Model):
             return f'1 {period[2]}'
 
 
+
 class Investment(models.Model):
     status = (
         ('pending', 'Pending'),
@@ -288,43 +299,55 @@ class Investment(models.Model):
         ('completed', 'Completed')
     )
     date = models.DateTimeField(auto_now_add=True)
-    investment_id = models.CharField(max_length=12, blank=False, null=False)
+    investment_id = models.CharField(max_length=12, blank=False, null=False, unique=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     package = models.ForeignKey(Package, on_delete=models.SET_NULL, null=True)
     payment_method = models.CharField(max_length=60, null=False, blank=False)
-    amount = models.IntegerField(null=False, blank=False)
+    amount = models.FloatField(null=False, blank=False)
     status = models.CharField(max_length=60, choices=status, default='pending')
-    returns = models.IntegerField(default=0, null=False, blank=False)
+    returns = models.FloatField(default=0, null=False, blank=False)
+    approved_date = models.DateTimeField(null=True, blank=True)
+    end_date =  models.DateTimeField(null=True, blank=True, help_text="This field is calculated and depends on approved date")
 
     def __str__(self):
         return str(self.id)
 
-    @property
-    def approved_date(self):
-        if self.status == 'approved':
-            approveddate = datetime.datetime.now(tz=pytz.UTC)
-            return approveddate
-
-    @property
-    def end_date(self):
-        if self.status == 'approved':
-            enddate = datetime.datetime.now(tz=pytz.UTC) + datetime.timedelta(days=self.package.duration_in_days)
-            return enddate
-
-    
+    # This function performs a task while saving
     def save(self, *args, **kwargs):
-        if self.status == 'approved':
-            a_runInvestmentProcess = sync_to_async(runInvestmentProcess, thread_sensitive=False)
-            loop.create_task(a_runInvestmentProcess(self))
-            print('approved.. running task via background')
-        super().save(*args, **kwargs)
-
-
+        if self.status == 'pending':
+            super().save(*args, **kwargs)
+        elif self.status == 'completed':
+            super().save(*args, **kwargs)
+        elif self.status == 'approved':
+            if not self.approved_date:
+                '''
+                * Remember that if we don't have an approved date then it's the first time we are 
+                approving the investment and that's when we want to carry out all activities
+                * Becareful of identations else alot will break
+                '''
+                # Setting approved date to current date and time
+                self.approved_date = datetime.datetime.now(tz=pytz.UTC)
+                # Setting end date to date and time after package duration from approved date
+                self.end_date = self.approved_date + datetime.timedelta(days=self.package.duration_in_days)
+                # Notifying user of approved investment
+                notification = Notification.objects.create(user=self.user, message=f"Your investment of ${self.amount}({self.payment_method}) and ID - {self.investment_id} has successfully been approved")
+                notification.save()
+                # Adding referral commission to upline
+                if self.user.profile.upline:
+                    commission = 0.1 * self.amount
+                    upliner_account = Account.objects.get(user=self.user.profile.upline)
+                    updateAccount(upliner_account, "credit", commission)
+            # Saving
+            super().save(*args, **kwargs)
+        elif self.status == 'declined':
+            updateAccount(self.user.account, "credit", self.amount)
+            investment = Investment.objects.get(id=self.id)
+            investment.delete()
+        
     @property
     # This defines the percentage daily profit returns
     def daily_profit_percentage(self):
         return self.package.daily_profit_percentage
-
 
     @property
     # This defines daily profit for investment amount
@@ -386,7 +409,6 @@ class Investment(models.Model):
             address = company.dashcoin_address
         return address
 
-
     # Payment QR-code to be used for investment
     @property
     def payment_qrcode(self):
@@ -426,29 +448,50 @@ class Investment(models.Model):
 
 
 
-class Transaction(models.Model):
+class Deposit(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    amount = models.FloatField(null=False, blank=False)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.date)
+
+
+
+class Withdraw(models.Model):
     status = (
-        ('pending', 'pending'),
-        ('approved', 'approved'),
-        ('declined', 'declined'),
-        ('completed', 'completed'),
-    )
-    transaction_types = (
-        ('deposit', 'deposit'),
-        ('withdraw', 'withdraw')
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('declined', 'Declined'),
     )
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    type = models.CharField(max_length=30, blank=False, choices=transaction_types, default='withdraw')
     payment_method = models.CharField(max_length=60, null=True, blank=True)
-    amount = models.IntegerField(null=False, blank=False)
+    amount = models.FloatField(null=False, blank=False)
     payment_address = models.CharField(max_length=60, null=True, blank=True)
     network = models.CharField(max_length=60, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=30, blank=False, choices=status, default='pending')
 
     def __str__(self):
-        return str(self.id)
+        return str(self.date)
 
+    # Function to run while saving model instance
+    def save(self, *args, **kwargs):
+        if self.status == 'pending':
+            super().save(*args, **kwargs)
+        elif self.status == 'approved':
+            updateAccount(self.user.account, "debit", self.amount)
+            super().save(*args, **kwargs)
+        elif self.status == 'declined':
+            updateAccount(self.user.account, "credit", self.amount)
+            withdrawal = Withdraw.objects.get(id=self.id)
+            withdrawal.delete()
+            notification = Notification.objects.create(
+                user=self.user, 
+                message=f"Your withdrawal request of ${self.amount} was declined"
+            )
+            notification.save()
+   
 
 
 class Message(models.Model):
@@ -461,6 +504,7 @@ class Message(models.Model):
     
     def __str__(self):
         return f'{self.date_received}'
+
 
 
 class Notification(models.Model):

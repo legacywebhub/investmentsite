@@ -90,6 +90,7 @@
                                                     </div>
                                                 </div> -->
                                                 <input type="hidden" name="location" id="location" class="form-control" />
+                                                <input type="hidden" name="timezone" id="timezone" class="form-control" />
                                                 <div class="col-12">
                                                     <div class="form-group">
                                                         <label class="control-label">Password*</label>
@@ -152,6 +153,7 @@
     <!-- custom app -->
     <script src="{% static 'assets/js/app.js' %}"></script>
 
+    <!-- Script for getting user location from longitude and latitude -->
     <script>
         let handleResults = (position) => {
             let {latitude, longitude} = position.coords;
@@ -159,7 +161,9 @@
             fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=870f0570505b4d4498b7b1d220992532`)
             .then(response => response.json())
             .then((data) => {
-                let userLocation = `${data.results[0].components.country}/${data.results[0].components.state}`;
+                let country =  data.results[0].components.country,
+                state = data.results[0].components.state,
+                userLocation = `${state}`;
                 console.log(userLocation);
                 document.getElementById('location').value = userLocation;
                 localStorage.setItem('location', userLocation);
@@ -178,6 +182,14 @@
             document.getElementById('location').value = userlocation;
         }
         
+    </script>
+
+    <!-- Script for getting user timezone -->
+    <script>
+        // Timezone settings
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // e.g. "America/New_York"
+        document.getElementById('timezone').value = timezone;
+        // console.log(document.getElementById('timezone').value);
     </script>
 </body>
 

@@ -89,6 +89,10 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT')
+    },
+    'sqlite': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -173,5 +177,54 @@ LOGIN_URL = 'mining:login'
 # JAZZMIN SETTINGS
 JAZZMIN_SETTINGS = {
     "site_title": "Mining Admin",
-    "site_header": "MINING ADMIN"
+    "site_header": "MINING ADMIN",
+    
+    # Logo to use for your site, must be present in static files, used for brand on top left
+    #"site_logo": "books/img/logo.png",
+
+    # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
+    #"login_logo": None,
 }
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "darkly",  #darkly/flatly
+    #"dark_mode_theme": "darkly",
+}
+
+
+'''
+# Logger
+LOGGING = {
+    'version':1,
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+        'django.server': {
+            'handlers': ['server_file'],
+            'level': 'DEBUG',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': './logs/debug.log',
+           'formatter': 'simple'
+        },
+        'server_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': './logs/debug2.log',
+           'formatter': 'simple'
+        }
+    },
+    'formatters': {
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        }
+    }
+}
+'''

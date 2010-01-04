@@ -1,6 +1,14 @@
 {% extends 'dashboardbase.html' %}
 {% load static % }
 
+{% block style %}
+<style>
+    .withdraw-submit {
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
 {% block title %}
 <title>Withdraw assets | {{company.name}}</title>
 {% endblock %}
@@ -76,9 +84,10 @@
                         <input type="text" maxlength="100" class="form-control" id="address" name="address">
                     </div>
                     <div class="form-group">
-                        <label for="network">Network</label>
+                        <label for="network">Network (optional)</label>
                         <select class="js-basic-single form-control" id="network" name="network">
                             <optgroup label="NETWORK">
+                                <option value="" default>CHOOSE NETWORK</option>
                                 <option value="bitcoin">BITCOIN</option>
                                 <option value="erc20">ERC20</option>
                                 <option value="trc20">TRC20</option>
@@ -88,7 +97,7 @@
                             </optgroup>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary" name="withdraw-submit">Continue</button>
+                    <button type="submit" class="btn btn-primary withdraw-submit" name="withdraw-submit">Continue</button>
                 </form>
             </div>
         </div>

@@ -1,11 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import User, Profile, Account, Investment
-from asgiref.sync import sync_to_async
-import asyncio
-from .utils import runInvestmentProcess
+from .models import User, Profile, Account
 
-loop = asyncio.get_event_loop()
 
 @receiver(post_save, sender=User)
 def build_profile(sender, instance, created, **kwargs):

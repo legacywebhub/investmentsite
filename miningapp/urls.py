@@ -18,9 +18,10 @@ urlpatterns = [
     path('account/withdrawal-history/', views.withdrawalHistory, name='withdrawal_history'),
     path('account/withdraw/', views.withdrawalAssets, name='withdraw'),
     path('account/invest/', views.createInvest, name='invest'),
-    path('account/invest/invoice/', views.invoice, name='invoice'),
+    path('account/invest/invoice/<str:investment_id>/', views.invoice, name='invoice'),
     path('account/profile/', views.profile, name='profile'),
     path('account/affiliates/', views.affiliates, name='affiliates'),
+    path('account/notifications/', views.notifications, name='notifications'),
     path('account/change-password/', PasswordsChangeView.as_view(template_name="change_password.html")),
     path('account/change-password/success/', views.passwordChangeSuccess, name="password_change_success"),
 

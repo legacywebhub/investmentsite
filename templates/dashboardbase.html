@@ -27,6 +27,13 @@
     .sidebar-nav li a{
         color: #fff;
     }
+    .sidebar-count {
+        padding: 1px 5px;
+        border-radius: 20%;
+        color: #fff;
+        background-color: #8e54e9;
+        margin-left: 3px;
+    }
     .info {
         color: rgba(2, 2, 211, 0.753);
     }
@@ -34,7 +41,7 @@
         color: rgba(5, 187, 5, 0.801);
     }
     .error {
-        color: rgba(255, 0, 0, 0.801)
+        color: rgba(255, 0, 0, 0.801);
     }
     .u {
         text-transform: uppercase;
@@ -151,19 +158,19 @@
                                     <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fe fe-bell"></i>
                                         <span class="notify">
-                                                    <span class="blink"></span>
+                                        <span class="blink"></span>
                                         <span class="dot"></span>
                                         </span>
                                     </a>
-                                    <div class="dropdown-menu extended animated fadeIn" aria-labelledby="navbarDropdown">
+                                    <div id="notification-menu" class="dropdown-menu extended animated fadeIn" aria-labelledby="navbarDropdown">
                                         <ul>
-                                            <li class="dropdown-header bg-gradient p-4 text-white text-left">Notifications
-                                                <a href="#" class="float-right btn btn-square btn-inverse-light btn-xs m-0">
-                                                    <!--<span class="font-13"> Clear all</span></a>-->
+                                            <li class="dropdown-header bg-gradient p-4 text-white text-left">Recent notifications
+                                                <!-- <a href="#" class="float-right btn btn-square btn-inverse-light btn-xs m-0">
+                                                    <span class="font-13">{{notifications.count}}</span></a> -->
                                             </li>
                                             <li class="dropdown-body min-h-240 nicescroll">
                                                 <ul class="scrollbar scroll_dark max-h-240">
-                                                    {% for notification in notifications %}
+                                                    {% for notification in recent_notifications %}
                                                     <li>
                                                         <a href="javascript:void(0)">
                                                             <div class="notification d-flex flex-row align-items-center">
@@ -178,7 +185,7 @@
                                                 </ul>
                                             </li>
                                             <li class="dropdown-footer">
-                                                <a class="font-13" href="javascript:void(0)"> View All Notifications
+                                                <a class="font-13" href="{% url 'mining:notifications' %}"> View All Notifications
                                                 </a>
                                             </li>
                                         </ul>
@@ -203,11 +210,13 @@
                                         </div>
                                         <div class="p-4">
                                             <a class="dropdown-item d-flex nav-link" href="{% url 'mining:profile' %}">
-                                                <i class="fa fa-user pr-2 text-success"></i> Profile</a>
-                                            <a class="dropdown-item d-flex nav-link" href="javascript:void(0)">
-                                                <i class="fa fa-envelope pr-2 text-primary"></i> Inbox
-                                                <span class="badge badge-primary ml-auto">6</span>
+                                                <i class="fa fa-user pr-2 text-success"></i> Profile
                                             </a>
+                                            <a class="dropdown-item d-flex nav-link" href="{% url 'mining:notifications' %}">
+                                                <i class="fa fa-envelope pr-2 text-primary"></i> Inbox&nbsp;&nbsp;
+                                                <span class="badge badge-primary ml-auto">{{total_notifications}}</span>
+                                            </a>
+                                            <!--
                                             <a class="dropdown-item d-flex nav-link" href="javascript:void(0)">
                                                 <i class=" ti ti-settings pr-2 text-info"></i> Settings
                                             </a>
@@ -227,6 +236,7 @@
                                                     </a>
                                                 </div>
                                             </div>
+                                            -->
                                         </div>
                                     </div>
                                 </li>
@@ -275,8 +285,8 @@
                             </li>
                             <li class="nav-static-title">Settings</li>
                             <li><a href="{% url 'mining:profile' %}"><i class="ti ti-user"></i><span class="nav-title"> Profile</span></a> </li>
-                            <li><a href="{% url 'mining:affiliates' %}"><i class="ti ti-link"></i><span class="nav-title"> Affiliates</span></a> </li>
-                            <li><a href="#"><i class="ti ti-bell"></i><span class="nav-title"> Notification</span></a></li>
+                            <li><a href="{% url 'mining:affiliates' %}"><i class="ti ti-link"></i><span class="nav-title"> Affiliates</span> <span class="sidebar-count">{{request.user.profile.downlines.all.count}}</span></a> </li>
+                            <li><a href="{% url 'mining:notifications' %}"><i class="ti ti-bell"></i><span class="nav-title"> Notifications</span> <span class="sidebar-count">{{total_notifications}}</span></a></li>
                             <li><a href="{% url 'mining:logout' %}"><i class="ti ti-power-off"></i><span class="nav-title"> Logout</span></a></li>
                         </ul>
                     </div>

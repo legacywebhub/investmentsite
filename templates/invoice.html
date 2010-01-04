@@ -18,6 +18,9 @@
 .invoice {
     width: 60%;
 }
+.loading-gif {
+    width: 20px;
+}
 @media screen and (max-width: 900px) {
     .payment, .invoice {
         width: 100%;
@@ -148,12 +151,16 @@
                             <b class="b">{{investment.payment_method}}</b><br>${{investment.amount}}
                         </div>
                     </div>
+                    {% if investment.status == 'pending' %}
                     <div>
-                        <button class='btn btn-primary' id='confirm-button'>Payment status</button>
+                        <button class='btn btn-primary' id='confirm-button'><span class="btn-text">Confirm payment</span></button>
                     </div>
+                    {% endif %}
                 </div>
-                <p><button class="btn btn-primary" id="pay-button">Pay from balance</button></p><br>
+                {% if investment.status == 'pending' %}
+                <p><button class="btn btn-primary" id="pay-button"><span class="btn-text">Pay from balance</span></button></p><br>
                 <p id="message"></p>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -184,10 +191,16 @@
                     <li class="invoice-item"><span class="invoice-item-title">TOTAL PROFIT</span> <span class="invoice-result">${{investment.total_profit}}</span></li>
                     <li class="invoice-item"><span class="invoice-item-title">TOTAL RETURNS</span> <span class="invoice-result">${{investment.roi}}</span></li>
                     <li class="invoice-item"><span class="invoice-item-title">TOTAL CURRENT RETURNS</span> <span class="invoice-result"><b>${{investment.returns}}</b></span></li>
-                    <li class="invoice-item"><span class="invoice-item-title">ISSUE DATE</span> <span class="invoice-result">{{investment.date}}</span></li>
+                    <li class="invoice-item"><span class="invoice-item-title">ISSUE DATE</span> <span class="invoice-result issue-date"></span></li>
+                    {% if investment.approved_date %}
+                    <li class="invoice-item"><span class="invoice-item-title">APPROVED DATE</span> <span class="invoice-result approved-date"></span></li>
+                    {% endif %}
+                    {% if investment.end_date %}
+                    <li class="invoice-item"><span class="invoice-item-title">END DATE</span> <span class="invoice-result end-date"></span></li>
+                    {% endif %}
                     <li class="invoice-item"><span class="invoice-item-title">PAYMENT METHOD</span> <span class="invoice-result">{{investment.payment_method}}</span></li>
                     <li class="invoice-item"><span class="invoice-item-title">DURATION</span> <span class="invoice-result">{{investment.package.duration_in_days}} DAYS</span></li>
-                    <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b>{{investment.status}}</b></span></li>
+                    <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b>{{investment.get_status_display}}</b></span></li>
                 </div>
             </div>
         </div>
@@ -224,6 +237,8 @@ function copyText(arg) {
     alert("Copied the text: " + arg.value);
 }
 
+
+// Function to fund investment from account user's balance
 function investFromBalance(){
     let url = '/invest_from_balance/',
     data = {
@@ -233,6 +248,10 @@ function investFromBalance(){
     };
 
     // Load animation function
+    console.log('About to invest from user balance...');
+    let btnText = payBtn.querySelector('.btn-text');
+    btnText.innerHTML = `<img src="{% static 'assets/img/loading.gif' %}" class="loading-gif" alt="fetching...">`;
+    payBtn.disabled = true;
 
     fetch(url, {
         method: "POST",
@@ -247,17 +266,37 @@ function investFromBalance(){
     })
     .then((data)=>{
         console.log('data:', data)
-        message.innerText = data;
+        if (data['status'] == 'success') {
+            message.style.color = 'rgba(5, 187, 5, 0.801)';
+            message.innerText = data['message'];
+            btnText.innerHTML = `Success`;
+            setTimeout(() => window.location.reload(), 5000);
+        } else {
+            message.style.color = 'rgba(255, 0, 0, 0.801)';
+            message.innerText = data['message'];
+            btnText.innerHTML = `Pay from balance`;
+            payBtn.disabled = false;
+        }
     })
     .catch((err)=>{
         console.log(err);
+        message.style.color = 'rgba(255, 0, 0, 0.801)';
+        message.innerText = 'Error while placing investment. Try again later';
+        btnText.innerHTML = `Pay from balance`;
+        payBtn.disabled = false;
     })
 }
 
+
+// Function to notify admins to confirm payment
 function confirmPayment(){
     let url = '/confirm_payment/';
 
     // Load animation function
+    console.log('About to invest from user balance...')
+    let btnText = confirmBtn.querySelector('.btn-text');
+    btnText.innerHTML = `<img src="{% static 'assets/img/loading.gif' %}" class="loading-gif" alt="fetching...">`;
+    confirmBtn.disabled = true;
 
     fetch(url, {
         method: "POST",
@@ -271,12 +310,31 @@ function confirmPayment(){
         return response.json()
     })
     .then((data)=>{
-        console.log('data:', data)
+        console.log(data)
+        message.style.color = 'rgba(5, 187, 5, 0.801)';
         message.innerText = data;
+        btnText.innerHTML = `Success`;
     })
     .catch((err)=>{
         console.log(err);
+        message.style.color = 'rgba(255, 0, 0, 0.801)';
+        message.innerText = 'Error while confirming payment. Try again later';
+        btnText.innerHTML = `Confirm payment`;
+        confirmBtn.disabled = false;
     })
 }
+</script>
+
+
+<!--  Script to convert our utc datetime to local time datetime  -->
+<script>
+    var issueDate = new Date(`{{investment.date|date:"D, d M Y H:i:s"}} UTC`).toLocaleDateString(),
+    approvalDate = new Date('{{investment.approved_date.isoformat}}').toLocaleString(),
+    endDate = new Date('{{investment.end_date.isoformat}}').toLocaleString();
+    //timezone = '{{request.user.profile.timezone}}';
+
+    document.querySelector('.issue-date').innerText = issueDate;
+    document.querySelector('.approved-date').innerText = approvalDate;
+    document.querySelector('.end-date').innerText = endDate;
 </script>
 {% endblock %}

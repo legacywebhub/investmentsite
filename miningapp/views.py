@@ -3,19 +3,22 @@ from django.http import JsonResponse, FileResponse
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.core.mail import send_mail
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import auth
-from django.contrib.auth.views import PasswordChangeView
-from django.contrib.auth.forms import PasswordChangeForm
 from django.conf import settings
 from django.urls import reverse_lazy
 from .models import *
+from .utils import updateInvestment, deleteOldNotifications
 import json
+# Auth imports
+from django.contrib.auth.models import auth
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.forms import PasswordChangeForm
 # Report lab imports
 import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
+
 
 
 # Create your views here.
@@ -35,6 +38,7 @@ def register(request):
             first_name = request.POST['first-name']
             last_name = request.POST['last-name']
             location = request.POST['location']
+            timezone = request.POST['timezone']
             password1 = request.POST['password1']
             password2 = request.POST['password2']
 
@@ -42,18 +46,23 @@ def register(request):
                 if User.objects.filter(email=email).exists():
                     messages.error(request, 'Sorry this email has already been taken!')
                 else:
-                    # Saving user and user instances
-                    user = User.objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password2)
-                    user.save()
-                    # On user save, a profile instance is created dynamically from signals.py
-                    # Fetching profile of user created from signals.py to update upliner
-                    profile = Profile.objects.get(user=user)
-                    # Checking if user allowed location
-                    if location != '' or location != ' ':
-                        profile.location = location
-                    profile.save()
-                    messages.success(request, 'Your account has successfully been created... you can now sign in!')
-                    return redirect('mining:login')
+                    if len(password2) >= 7:
+                        # Saving user and user instances
+                        user = User.objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password2)
+                        user.save()
+                        # On user save, a profile instance is created dynamically from signals.py
+                        # Fetching profile of user created from signals.py to update upliner
+                        profile = Profile.objects.get(user=user)
+                        # Setting timezone of user
+                        profile.timezone = timezone
+                        # Checking if user allowed location
+                        if location != '' or location != ' ':
+                            profile.location = location
+                        profile.save()
+                        messages.success(request, 'Your account has successfully been created... you can now sign in!')
+                        return redirect('mining:login')
+                    else:
+                        messages.error(request, 'Password length cannot be less than 7... Please try again')
             else:
                 messages.error(request, 'Passwords does not match... Please try again')
     return render(request, 'register.html', {'company':company})
@@ -74,30 +83,35 @@ def uplineRegister(request, refcode):
             first_name = request.POST['first-name']
             last_name = request.POST['last-name']
             location = request.POST['location']
+            timezone = request.POST['timezone']
             password1 = request.POST['password1']
             password2 = request.POST['password2']
-
 
             if password2 == password1:
                 if User.objects.filter(email=email).exists():
                     messages.error(request, 'Sorry this email has already been taken!')
                 else:
-                    # Saving user and user instances
-                    user = User.objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password2)
-                    user.save()
-                    # On user save, a profile instance is created dynamically from signals.py
-                    # Fetching profile of user created from signals.py to update upliner
-                    profile = Profile.objects.get(user=user)
-                    profile.upline = upline.user
-                    # Checking if user allowed location
-                    if location != '' or location != ' ':
-                        profile.location = location
-                    profile.save()
-                    # Updating downlines for upline
-                    upline.downlines.add(user)
-                    upline.save()
-                    messages.success(request, 'Your account has successfully been created... you can now sign in!')
-                    return redirect('mining:login')
+                    if len(password2) >= 7:
+                        # Saving user and user instances
+                        user = User.objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password2)
+                        user.save()
+                        # On user save, a profile instance is created dynamically from signals.py
+                        # Fetching profile of user created from signals.py to update upliner
+                        profile = Profile.objects.get(user=user)
+                        profile.upline = upline.user
+                        # Setting timezone of user
+                        profile.timezone = timezone
+                        # Checking if user allowed location
+                        if location != '' or location != ' ':
+                            profile.location = location
+                        profile.save()
+                        # Updating downlines for upline
+                        upline.downlines.add(user)
+                        upline.save()
+                        messages.success(request, 'Your account has successfully been created... you can now sign in!')
+                        return redirect('mining:login')
+                    else:
+                        messages.error(request, 'Password length cannot be less than 7... Please try again')
             else:
                 messages.error(request, 'Passwords does not match... Please try again')
     return render(request, 'register.html', {'company': company,'upline':upline})
@@ -172,14 +186,28 @@ def contact(request):
 
 @login_required
 def account(request):
+    # run check and update investments
+    updateInvestment(request.user)
     company = CompanyInfo.objects.last()
     account = Account.objects.get(user=request.user)
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
+    notifications = Notification.objects.filter(user=request.user)
+    total_notifications = notifications.count
+    recent_notifications = notifications.order_by('-date')[:5]
+    
+
+    # checking for active mining to display mining animation on frontend or not
+    if Investment.objects.filter(user=request.user, status="approved").exists():
+        mining = True
+    else:
+        mining = False
 
     context = {
         'company':company,
         'notifications':notifications,
-        'account':account, 
+        'total_notifications': total_notifications,
+        'recent_notifications': recent_notifications,
+        'account': account,
+        'mining': mining,
     }
     return render(request, 'dashboard.html', context)
 
@@ -187,9 +215,13 @@ def account(request):
 
 @login_required
 def profile(request):
+    # delete notifications of user > 3days
+    deleteOldNotifications(request.user)
     user = request.user
     company = CompanyInfo.objects.last()
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
+    notifications = Notification.objects.filter(user=request.user)
+    total_notifications = notifications.count
+    recent_notifications = notifications.order_by('-date')[:5]
 
     if request.method == 'POST':
         if 'profile-pic-submit' in request.POST:
@@ -204,6 +236,7 @@ def profile(request):
             first_name = request.POST['first-name'] or None
             last_name = request.POST['last-name'] or None
             email = request.POST['email'] or None
+            timezone = request.POST['timezone']
 
             if email=='' or email==None:
                 email = request.user.email
@@ -220,8 +253,19 @@ def profile(request):
             user.last_name = last_name
             user.email = email
             user.save()
+            # Updating user timezone
+            profile = user.profile
+            profile.timezone = timezone
+            profile.save()
             messages.success(request, 'Details successfully updated')
-    return render(request, 'profile.html', {'user':user, 'company':company, 'notifications':notifications})
+    context = {
+        'user':user, 
+        'company':company, 
+        'notifications':notifications,
+        'total_notifications': total_notifications,
+        'recent_notifications': recent_notifications,
+    }
+    return render(request, 'profile.html', context)
 
 
 
@@ -233,51 +277,95 @@ class PasswordsChangeView(PasswordChangeView):
 
 @login_required
 def passwordChangeSuccess(request):
+    # delete notifications of user > 3days
+    deleteOldNotifications(request.user)
     company = CompanyInfo.objects.last()
-    return render(request, 'success.html', {'company':company})
+    notifications = Notification.objects.filter(user=request.user)
+    total_notifications = notifications.count
+    recent_notifications = notifications.order_by('-date')[:5]
+    context = {
+        'company':company,
+        'total_notifications': total_notifications,
+        'recent_notifications': recent_notifications
+    }
+    return render(request, 'success.html', context)
 
 
 
 @login_required
 def investHistory(request):
+    # run check and update investments
+    updateInvestment(request.user)
     company = CompanyInfo.objects.last()
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
+    notifications = Notification.objects.filter(user=request.user)
+    total_notifications = notifications.count
+    recent_notifications = notifications.order_by('-date')[:5]
     user_investments = Investment.objects.filter(user=request.user).order_by('-date')
     p = Paginator(user_investments, 10)
     page = request.GET.get('page')
     investments = p.get_page(page)
-    context = {'company':company, 'notifications':notifications, 'investments':investments}
+    context = {
+        'company':company, 
+        'notifications':notifications,
+        'total_notifications': total_notifications,
+        'recent_notifications': recent_notifications,
+        'investments':investments
+    }
     return render(request, 'investment_history.html', context)
 
 
 
 @login_required
 def investmentDetail(request, investment_id):
+    # run check and update investments
+    updateInvestment(request.user)
     company = CompanyInfo.objects.last()
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
+    notifications = Notification.objects.filter(user=request.user)
+    total_notifications = notifications.count
+    recent_notifications = notifications.order_by('-date')[:5]
     investment = get_object_or_404(Investment, investment_id=investment_id)
-    context = {'company':company, 'notifications':notifications, 'investment':investment}
+    context = {
+        'company':company, 
+        'notifications':notifications,
+        'total_notifications': total_notifications,
+        'recent_notifications': recent_notifications,
+        'investment':investment
+    }
     return render(request, 'investment_detail.html', context)
 
 
 
 @login_required
 def withdrawalHistory(request):
+    # delete notifications of user > 3days
+    deleteOldNotifications(request.user)
     company = CompanyInfo.objects.last()
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
-    user_withdrawals = Transaction.objects.filter(user=request.user, type='withdraw').order_by('-date')
+    notifications = Notification.objects.filter(user=request.user)
+    total_notifications = notifications.count
+    recent_notifications = notifications.order_by('-date')[:5]
+    user_withdrawals = Withdraw.objects.filter(user=request.user).order_by('-date')
     p = Paginator(user_withdrawals, 10)
     page = request.GET.get('page')
     withdrawals = p.get_page(page)
-    context = {'company': company,'notifications': notifications, 'withdrawals':withdrawals}
+    context = {
+        'company': company,
+        'notifications': notifications, 
+        'total_notifications': total_notifications,
+        'recent_notifications': recent_notifications,
+        'withdrawals':withdrawals
+    }
     return render(request, 'withdrawal_history.html', context)
 
 
 
 @login_required
 def withdrawalAssets(request):
+    # delete notifications of user > 3days
+    deleteOldNotifications(request.user)
     company = CompanyInfo.objects.last()
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
+    notifications = Notification.objects.filter(user=request.user)
+    total_notifications = notifications.count
+    recent_notifications = notifications.order_by('-date')[:5]
     account = Account.objects.get(user=request.user)
 
     if request.method == 'POST':
@@ -287,52 +375,65 @@ def withdrawalAssets(request):
             amount = int(request.POST['amount'])
             network = request.POST['network']
 
+            if not network or network == '':
+                network = None
+
             if amount <= account.total_balance:
                 try:
-                    withdraw_request = Transaction.objects.create(
+                    withdraw_request = Withdraw.objects.create(
                         user=request.user,
-                        type='withdraw',
                         payment_method=payment_method,
                         amount=amount,
                         payment_address=payment_addresss,
                         network=network
                     )
                     withdraw_request.save()
-                    # Updating user account after placing withdrawal request
-                    # adding up balance and referral bonus
-                    account.balance += account.referral_bonus
-                    # resetting referral bonus
-                    account.referral_bonus = 0
-                    # deducting from balance
-                    account.balance = account.balance - amount
-                    account.save()
                     messages.success(request, 'Withdraw request was successsfully placed')
                 except Exception as e:
                     print(e)
                     messages.error(request, e)
             else:
                 messages.error(request, 'Insufficient funds...')
-    context = {'company':company, 'notifications':notifications}
+    context = {
+        'company':company, 
+        'notifications':notifications,
+        'total_notifications': total_notifications,
+        'recent_notifications': recent_notifications,
+    }
     return render(request, 'withdraw_assets.html', context)
 
 
 
 @login_required
 def createInvest(request):
+    # delete notifications of user > 3days
+    deleteOldNotifications(request.user)
     company = CompanyInfo.objects.last()
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
+    notifications = Notification.objects.filter(user=request.user)
+    total_notifications = notifications.count
+    recent_notifications = notifications.order_by('-date')[:5]
     packages = Package.objects.all()
-    context = {'company':company, 'notifications': notifications, 'packages':packages}
+    context = {
+        'company':company, 
+        'notifications': notifications, 
+        'total_notifications': total_notifications,
+        'recent_notifications': recent_notifications,
+        'packages':packages
+    }
     return render(request, 'create_invest.html', context)
 
 
 
 @login_required
-def invoice(request):
+def invoice(request, investment_id):
+    # run check and update investments
+    updateInvestment(request.user)
     company = CompanyInfo.objects.last()
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
+    notifications = Notification.objects.filter(user=request.user)
+    total_notifications = notifications.count
+    recent_notifications = notifications.order_by('-date')[:5]
     try:
-        investment = Investment.objects.filter(user=request.user).last()
+        investment = Investment.objects.get(investment_id=investment_id)
         print(investment)
     except Exception as e:
         print(e)
@@ -341,6 +442,8 @@ def invoice(request):
     context = {
         'company':company,
         'notifications':notifications,
+        'recent_notifications': recent_notifications,
+        'total_notifications':total_notifications,
         'investment':investment, 
     }
     return render(request, 'invoice.html', context)
@@ -349,28 +452,64 @@ def invoice(request):
 
 @login_required
 def affiliates(request):
+    # delete notifications of user > 3days
+    deleteOldNotifications(request.user)
     company = CompanyInfo.objects.last()
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
+    notifications = Notification.objects.filter(user=request.user)
+    total_notifications = notifications.count
+    recent_notifications = notifications.order_by('-date')[:5]
     profile = Profile.objects.get(user=request.user)
     p = Paginator(profile.downlines.all(), 10)
     page = request.GET.get('page')
     downlines = p.get_page(page)
-    context = {'company':company, 'notifications':notifications, 'downlines':downlines}
+    context = {
+        'company':company, 
+        'notifications':notifications, 
+        'recent_notifications':recent_notifications, 
+        'total_notifications':total_notifications,
+        'downlines':downlines
+    }
     return render(request, 'affiliates.html', context)
 
 
 
-def error404(request, exception):
+def notifications(request):
+    # delete notifications of user > 3days
+    deleteOldNotifications(request.user)
     company = CompanyInfo.objects.last()
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
+    notifications = Notification.objects.filter(user=request.user).order_by('-date')
+    total_notifications = notifications.count
+    recent_notifications = notifications[:5]
+    p = Paginator(notifications, 10)
+    page = request.GET.get('page')
+    notifications = p.get_page(page)
+    page_list = range(1, notifications.paginator.num_pages + 1)
+    context = {
+        'company':company, 
+        'notifications':notifications, 
+        'recent_notifications':recent_notifications,
+        'total_notifications':total_notifications,
+        'page_list': page_list
+    }
+    return render(request, 'notifications.html', context)
+
+
+
+def error404(request, exception):
+    # delete notifications of user > 3days
+    deleteOldNotifications(request.user)
+    company = CompanyInfo.objects.last()
+    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:5]
     context = {'company':company, 'notifications':notifications}
     return render(request, 'error404.html', context)
 
 
 
 def error500(request):
+    # delete notifications of user > 3days
+    deleteOldNotifications(request.user)
     company = CompanyInfo.objects.last()
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:4]
+    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:5]
     context = {'company':company, 'notifications':notifications}
     return render(request, 'error500.html', context)
 
@@ -381,60 +520,69 @@ def error500(request):
 # View to start new mining investment
 def processInvestment(request):
     data = json.loads(request.body)
-    id = data['investment']['id']
-    package = int(data['investment']['package'])
+    investment_id = data['investment']['id']
+    package_id = int(data['investment']['package'])
     payment = data['investment']['payment']
     amount = data['investment']['amount']
-    package = Package.objects.get(id=2)
+    package = Package.objects.get(id=package_id)
     
     try:
         investment = Investment.objects.create(
-            investment_id = id,
+            investment_id = investment_id,
             user = request.user,
             package = package,
             payment_method = payment,
             amount = amount
         )
         investment.save()
-        return JsonResponse(f'Mining Investment was successfully placed', safe=False)
+
+        response = {
+            'status': 'success',
+            'message': 'Mining Investment was successfully placed',
+            'invoice-url': f'/account/invest/invoice/{investment.investment_id}/'
+        }
     except Exception as e:
         print(e)
-        return JsonResponse("Mining project could not be placed", safe=False)
+        response = {
+            'status': 'error',
+            'message': 'Sorry there was an error while placing investment',
+            'error-message': e
+        }
+    return JsonResponse(response, safe=False)
 
 
 # View to invest from account balance
 def investFromBalance(request):
     data = json.loads(request.body)
     print(data)
-    id = data['investment']['id']
-    action = data['investment']['action']
+    investment_id = data['investment']['id']
     amount = int(data['investment']['amount'])
     account = Account.objects.get(user=request.user)
-    investment = Investment.objects.get(investment_id=id)
+    investment = Investment.objects.get(investment_id=investment_id)
 
-    if action == 'pay':
-        if amount <= account.total_balance:
-            # Merging up account balance and bonus
-            account.balance += account.referral_bonus
-            account.referral_bonus = 0
-            # Deducting amount from account balance to fund investment
-            account.balance -= amount
-            account.save() 
+    if amount <= account.total_balance:
+        if investment.status != "approved":
+            updateAccount(account, "debit", amount)
             # Approving investment since user balance has sufficient funds
-            investment.status == "approved"
+            investment.status = "approved"
             investment.save()
-            # Adding to transaction history
-            transaction = Transaction.objects.create(
-                user=request.user,
-                type='withdraw',
-                amount=amount
-            )
-            transaction.save()
-            return JsonResponse("Mining has been approved and successfully started", safe=False)
+            
+            response = {
+                'status': 'success',
+                'message': "Mining has been approved and successfully started",
+            }
         else:
-            return JsonResponse("Insufficient funds", safe=False)
+            response = {
+                'status': 'error',
+                'message': "Mining has already been approved",
+            }
     else:
-        return JsonResponse("Invalid command", safe=False)
+        response = {
+            'status': 'error',
+            'message': "Insufficient funds",
+        }
+
+    return JsonResponse(response, safe=False)
 
 
 # view to alert admins of payment
@@ -474,39 +622,89 @@ def investmentPDF(request, investment_id):
     textob.setTextOrigin(inch, inch)
     textob.setFont("Helvetica", 12)
 
-    #Add lines of text
-    lines = [
-    f'{company.name}',
-    '',
-    '===============================================================',
-    '',
-    'Mining details',
-    '',
-    '* Mining ID: ' + investment.investment_id,
-    '',
-    '* Investor name: ' + investment.user.fullname,
-    '',
-    '* Investor email: ' + investment.user.email,
-    '',
-    '* Mining package: ' + investment.package.package,
-    '',
-    '* Mining amount: $' + str(investment.amount),
-    '',
-    '* Mining daily profit: $' + str(investment.daily_profit),
-    '',
-    '* Mining total profits: $' + str(investment.total_profit),
-    '',
-    '* Mining returns: $' + str(investment.roi),
-    '',
-    '* Mining current returns: $' + str(investment.returns),
-    '',
-    '* Mining duration: ' + str(investment.package.duration_in_days) + 'days',
-    '',
-    '* Mining status: ' + investment.get_status_display(),
-    '',
-    '===============================================================',
-    '',
-    ]
+    # Converting investment date according to user timezone
+    date = investment.date.astimezone(pytz.timezone(investment.user.profile.timezone))
+
+    if investment.status == 'approved':
+        # Converting investment approval and end dates according to user timezone
+        approved_date = investment.approved_date.astimezone(pytz.timezone(investment.user.profile.timezone))
+        end_date = investment.end_date.astimezone(pytz.timezone(investment.user.profile.timezone))
+
+        #Add lines of text
+        lines = [
+        f'{company.name}',
+        '',
+        '===============================================================',
+        '',
+        'Mining details',
+        '',
+        '* Issued date: ' + str(date),
+        '',
+        '* Mining ID: ' + investment.investment_id,
+        '',
+        '* Investor name: ' + investment.user.fullname,
+        '',
+        '* Investor email: ' + investment.user.email,
+        '',
+        '* Mining package: ' + investment.package.package,
+        '',
+        '* Mining amount: $' + str(investment.amount),
+        '',
+        '* Mining daily profit: $' + str(investment.daily_profit),
+        '',
+        '* Mining total profits: $' + str(investment.total_profit),
+        '',
+        '* Mining returns: $' + str(investment.roi),
+        '',
+        '* Mining current returns: $' + str(investment.returns),
+        '',
+        '* Mining duration: ' + str(investment.package.duration_in_days) + 'days',
+        '',
+        '* Mining status: ' + investment.get_status_display(),
+        '',
+        '* Mining approved date: ' + str(approved_date),
+        '',
+        '* Mining end date: ' + str(end_date),
+        '',
+        '===============================================================',
+        '',
+        ]
+    else:
+        #Add lines of text
+        lines = [
+        f'{company.name}',
+        '',
+        '===============================================================',
+        '',
+        'Mining details',
+        '',
+        '* Issued date: ' + str(date),
+        '',
+        '* Mining ID: ' + investment.investment_id,
+        '',
+        '* Investor name: ' + investment.user.fullname,
+        '',
+        '* Investor email: ' + investment.user.email,
+        '',
+        '* Mining package: ' + investment.package.package,
+        '',
+        '* Mining amount: $' + str(investment.amount),
+        '',
+        '* Mining daily profit: $' + str(investment.daily_profit),
+        '',
+        '* Mining total profits: $' + str(investment.total_profit),
+        '',
+        '* Mining returns: $' + str(investment.roi),
+        '',
+        '* Mining current returns: $' + str(investment.returns),
+        '',
+        '* Mining duration: ' + str(investment.package.duration_in_days) + 'days',
+        '',
+        '* Mining status: ' + investment.get_status_display(),
+        '',
+        '===============================================================',
+        '',
+        ]
 
     for line in lines:
         textob.textLine(line)
@@ -516,4 +714,4 @@ def investmentPDF(request, investment_id):
     c.showPage()
     c.save()
     buf.seek(0)
-    return FileResponse(buf, as_attachment=True, filename=f'mining-info-{investment.investment_id}.pdf')
+    return FileResponse(buf, as_attachment=True, filename=f'mining-{investment.investment_id}.pdf')

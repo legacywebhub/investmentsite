@@ -186,7 +186,13 @@
                     <li class="invoice-item"><span class="invoice-item-title">TOTAL PROFIT</span> <span class="invoice-result">${{investment.total_profit}}</span></li>
                     <li class="invoice-item"><span class="invoice-item-title">TOTAL RETURNS</span> <span class="invoice-result">${{investment.roi}}</span></li>
                     <li class="invoice-item"><span class="invoice-item-title">TOTAL CURRENT RETURNS</span> <span class="invoice-result"><b>${{investment.returns}}</b></span></li>
-                    <li class="invoice-item"><span class="invoice-item-title">ISSUE DATE</span> <span class="invoice-result">{{investment.date}}</span></li>
+                    <li class="invoice-item"><span class="invoice-item-title">ISSUE DATE</span> <span class="invoice-result issue-date">{{investment.date|date:"D, d M Y H:i:s"}}</span></li>
+                    {% if investment.approved_date %}
+                    <li class="invoice-item"><span class="invoice-item-title">APPROVED DATE</span> <span class="invoice-result approved-date"></span></li>
+                    {% endif %}
+                    {% if investment.end_date %}
+                    <li class="invoice-item"><span class="invoice-item-title">END DATE</span> <span class="invoice-result end-date"></span></li>
+                    {% endif %}
                     <li class="invoice-item"><span class="invoice-item-title">PAYMENT METHOD</span> <span class="invoice-result">{{investment.payment_method}}</span></li>
                     <li class="invoice-item"><span class="invoice-item-title">DURATION</span> <span class="invoice-result">{{investment.package.duration_in_days}} DAYS</span></li>
                     <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b>{{investment.get_status_display}}</b></span></li>
@@ -227,6 +233,7 @@
         alert("Copied the text: " + arg.value);
     }
     
+    // Function to fund investment from account user's balance
     function investFromBalance(){
         let url = '/invest_from_balance/',
         data = {
@@ -234,9 +241,9 @@
             amount : '{{investment.amount}}',
             action : 'pay'
         };
-    
+
         // Load animation function
-    
+
         fetch(url, {
             method: "POST",
             headers: {
@@ -250,18 +257,28 @@
         })
         .then((data)=>{
             console.log('data:', data)
-            message.innerText = data;
+            if (data['status'] == 'success') {
+                message.style.color = 'rgba(5, 187, 5, 0.801)';
+                message.innerText = data['message'];
+            } else {
+                message.style.color = 'rgba(255, 0, 0, 0.801)';
+                message.innerText = data['message'];
+            }
         })
         .catch((err)=>{
             console.log(err);
+            message.style.color = 'rgba(255, 0, 0, 0.801)';
+            message.innerText = 'Error while placing investment. Try again later'
         })
     }
-    
+
+
+    // Function to notify admins to confirm payment
     function confirmPayment(){
         let url = '/confirm_payment/';
-    
+
         // Load animation function
-    
+
         fetch(url, {
             method: "POST",
             headers: {
@@ -274,12 +291,27 @@
             return response.json()
         })
         .then((data)=>{
-            console.log('data:', data)
+            console.log(data)
+            message.style.color = 'rgba(5, 187, 5, 0.801)';
             message.innerText = data;
         })
         .catch((err)=>{
             console.log(err);
+            message.style.color = 'rgba(255, 0, 0, 0.801)';
+            message.innerText = 'Error while confirming payment. Try again later';
         })
     }
+</script>
+
+<!--  Script to convert our utc datetime to local time datetime  -->
+<script>
+    var issueDate = new Date(`{{investment.date|date:"D, d M Y H:i:s"}} UTC`).toLocaleDateString(),
+    approvalDate = new Date('{{investment.approved_date.isoformat}}').toLocaleString(),
+    endDate = new Date('{{investment.end_date.isoformat}}').toLocaleString();
+    //timezone = '{{request.user.profile.timezone}}';
+
+    document.querySelector('.issue-date').innerText = issueDate;
+    document.querySelector('.approved-date').innerText = approvalDate;
+    document.querySelector('.end-date').innerText = endDate;
 </script>
 {% endblock %}
