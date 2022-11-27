@@ -1,0 +1,12 @@
+.account {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+}
+.card-body big {
+    color: #fff;
+}
+.withdraw-submit {
+    width: 100%;
+}

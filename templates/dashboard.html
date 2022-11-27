@@ -1,0 +1,134 @@
+{% extends 'dashboardbase.html' %}
+{% load static % }
+
+{% block pagetitle %}
+<div class="row">
+    <div class="col-md-12 m-b-30">
+        <!-- begin page title -->
+        <div class="d-block d-lg-flex flex-nowrap align-items-center">
+            <div class="page-title mr-4 pr-4 border-right">
+                <h1>Dashboard</h1>
+            </div>
+            <div class="breadcrumb-bar align-items-center">
+                <nav>
+                    <ol class="breadcrumb p-0 m-b-0">
+                        <li class="breadcrumb-item">
+                            <a href="#"><i class="ti ti-home"></i></a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            Dashboard
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <!-- end page title -->
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Notification -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert border-0 alert-primary bg-gradient m-b-30 alert-dismissible fade show border-radius-none" role="alert">
+            <strong>Welcome {{user.username}}!</strong> You should check in on some of those
+            fields below.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <i class="ti ti-close"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<!-- End Notification -->
+<!-- end row -->
+<div class="row">
+    <div class="col-md-12 m-b-30">
+        <div class="card card-statistics h-100 m-b-0 bg-pink">
+            <div class="card-body account">
+                <span>
+                    <big class="text-uppercase d-block mt-1">Total investments</big>
+                    <strong>$450</strong>           
+                </span>
+                <span>
+                    <i class="fas fa-wallet fa-3x"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 m-b-30">
+        <div class="card card-statistics h-100 m-b-0 bg-primary">
+            <div class="card-body account">
+                <span>
+                    <big class="text-uppercase d-block mt-1">Active Mining</big>
+                    <strong>$5</strong>           
+                </span>
+                <span>
+                    <i class="fas fa-server fa-3x"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 m-b-30">
+        <div class="card card-statistics h-100 m-b-0 bg-orange">
+            <div class="card-body account">
+                <span>
+                    <big class="text-uppercase d-block mt-1">Referral bonus</big>
+                    <strong>$10</strong>           
+                </span>
+                <span>
+                    <i class="fas fa-users fa-3x"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 m-b-30">
+        <div class="card card-statistics h-100 m-b-0 bg-info">
+            <div class="card-body account">
+                <span>
+                    <big class="text-uppercase d-block mt-1">Total mining</big>
+                    <strong>$370</strong>           
+                </span>
+                <span>
+                    <i class="fas fa-download fa-3x"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 m-b-30">
+        <div class="card card-statistics h-100 m-b-0 bg-info">
+            <div class="card-body account">
+                <span>
+                    <big class="text-uppercase d-block mt-1">Total withdrawal</big>
+                    <strong>$75</strong>           
+                </span>
+                <span>
+                    <i class="fas fa-hand-holding-usd fa-3x"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 m-b-30">
+        <div class="card card-statistics h-100 m-b-0 bg-info">
+            <div class="card-body account">
+                <span>
+                    <big class="text-uppercase d-block mt-1">Pending withdrawal</big>
+                    <strong>$30</strong>           
+                </span>
+                <span>
+                    <i class="fas fa-spinner fa-3x"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 m-b-30">
+        <div class="card card-statistics h-100 m-b-0 bg-info">
+            <div class="card-body">
+                <big class="text-uppercase d-block mt-1">Referral link</big>
+                <div><input type="text" value="https:miningsite.com/paulson/"><button><i class="fas fa-paste"></i></button><div/>           
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
