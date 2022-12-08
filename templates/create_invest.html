@@ -1,5 +1,12 @@
 {% extends 'dashboardbase.html' %}
-{% load static % }
+{% load static %}
+
+{% block title %}
+<title>Mining plans | {{company.name}}</title>
+{% endblock %}
+
+{% block style %}
+{% endblock %}
 
 {% block pagetitle %}
 <div class="row">
@@ -30,125 +37,290 @@
 {% block content %}
 <!--pricing-contant 2-start-->
 <div class="row">
+    {% for package in packages %}
     <div class="col-xl-4">
+        <div class="card card-statistics text-center py-5">
+            <div class="card-body pricing-content">
+                <div class="pricing-content-card">
+                    <h5>{{package.package}}</h5>
+                    <h2 class="text-primary pt-3">{{package.daily_profit_percentage}}%</h2>
+                    <p class="text-primary pb-3">/ DAILY</p>
+                    <ul class="py-2">
+                        <li>${{package.minimum_amount}} MINIMUM</li>
+                        <li>${{package.maximum_amount}} MAXIMUM</li>
+                        <li>{{package.duration_in_days}} DAYS</li>
+                        <li>{{package.referral_commission}}% REFERRAL COMISSION</li>
+                        <li>24/7 SUPPORT</li>
+                    </ul>
+                    <form id='install_form2' method='POST' class="investment-form">
+                        {% csrf_token %}
+
+                        <input type='text' name='investment-id' class='investment-id' value="generateInvestmentID()" hidden>
+                        <input type='text' name='package' class='package' value="{{package.id}}" hidden>
+                        <input type='text' class='package-min' value='{{package.minimum_amount}}' hidden>
+                        <input type='text' class='package-max' value='{{package.maximum_amount}}' hidden>
+                        <input type='text' class='package-percentage' value='{{package.daily_profit_percentage}}' hidden>
+                        <input type='text' class='package-duration' value='{{package.duration_in_days}}' hidden>
+                    
+                        <div class='card'>
+                            <div class='card-body text-center crypto-buy-sell'>
+                                <div class='form-group mt-2'>
+                                    <label class='form-label float-left'>Enter Amount</label>
+                                    <label class='form-label float-right'>Select Payment</label>
+
+                                    <div class='input-group'>
+                                        <div class='input-group-prepend'>
+                                            <span class='input-group-text'>$</span>
+                                        </div>
+                                        <input aria-label='Investment Amount'  onkeypress="return onlyNumberKey(event)" class='form-control amount' name='amount' type='number' require>
+                                        <select class='form-control select2 br-0 bg-light nice-select_154 payment' name='payment' data-placeholder='Choose a payment method' require>
+                                            <optgroup label='Coins'>
+                                                <option value=''>PAYMENT</option>
+                                                <option value='BITCOIN'>BITCOIN</option>
+                                                <option value='ETHEREUM'>ETHEREUM </option>
+                                                <option value='BINANCE'>BINANCE</option>
+                                                <option value='USDT-TRC20'>USDT(TRC20)</option>
+                                                <option value='USDT-ERC20'>USDT(ERC20)</option>
+                                                <option value='USDT-BEP20'>USDT(BEP20)</option>
+                                                <option value='BUSD'>BUSD</option>
+                                                <option value='TRON'>TRON</option>
+                                                <option value='LITECOIN'>LITECOIN</option>
+                                                <option value='DASHCOIN'>DASHCOIN</option>
+                                                <option value='BITCOIN CASH'>BITCOIN-CASH</option>
+                                                <option value='DOGECOIN'>DOGECOIN</option>
+                                                <option value='XRP'>XRP</option>
+                                                <option value='SOLANA'>SOLANA</option>
+                                                <option value='CARDANO'>CARDANO (ADA)</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+
+                                    <strong> Daily profit</strong>
+                                    <div class='input-group'>
+                                        <div class='input-group-prepend'>
+                                            <span class='input-group-text'>$</span>
+                                        </div>
+                                        <input class='form-control bl-0 daily-profit' placeholder='' readonly>
+                                    </div>
+
+                                    <strong> Total profit</strong>
+                                    <div class='input-group'>
+                                        <div class='input-group-prepend'>
+                                            <span class='input-group-text'>$</span>
+                                        </div>
+                                        <input class='form-control bl-0 total-profit' placeholder='' readonly>
+                                    </div>
+                                </div>
+                                    
+                                <div>
+                                    <p class='message error mb-2'></p>
+                                    <div class='panel-footer text-center'>
+                                        <button type='submit' class='btn btn-primary'>Purchase Now!</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- <div class="col-xl-4">
         <div class="card card-statistics text-center py-5">
             <div class="card-body pricing-content">
                 <div class="pricing-content-card">
                     <h5>Premium</h5>
-                    <h2 class="text-primary pt-3">$150</h2>
-                    <p class="text-primary pb-3">/ Monthly</p>
+                    <h2 class="text-primary pt-3">2.5%</h2>
+                    <p class="text-primary pb-3">/ DAILY</p>
                     <ul class="py-2">
-                        <li>post jobs</li>
-                        <li>advanced instructors search</li>
-                        <li>invite candidates</li>
-                        <li>post events</li>
-                        <li>cancel any time</li>
+                        <li>$50 MINIMUM</li>
+                        <li>$1000 MAXIMUM</li>
+                        <li>2 DAYS</li>
+                        <li>10% REFERRAL COMISSION</li>
+                        <li>24/7 SUPPORT</li>
                     </ul>
-                    <div class="pt-2"><a href="javascript:void(0)" class="btn btn-inverse-secondary btn-round btn-sm">go premium</a></div>
-                </div>
-            </div>
-        </div>
-    </div>
+                    <form id='install_form2' method='POST' action='javascript:void(0)'>
+                        <input type='text' name='key' id='key_2' value='4470092103241' hidden>
+                        <input type='text' name='package_key' id='package_key_2' value='1678584096' hidden>
 
-    <div class="col-xl-4">
-        <div class="card card-statistics text-center pricing-highlight py-5">
-            <div class="card-body pricing-content">
-                <div class="pricing-content-card">
-                    <h5>starter</h5>
-                    <h2 class="text-primary pt-3">$100</h2>
-                    <p class="text-primary pb-3">/ Monthly</p>
-                    <ul class="py-2">
-                        <li>post jobs</li>
-                        <li>advanced instructors search</li>
-                        <li>invite candidates</li>
-                        <li>post events</li>
-                        <li>cancel any time</li>
-                    </ul>
-                    <div class="pt-2"><a href="javascript:void(0)" class="btn btn-warning btn-round btn-sm">go premium</a></div>
-                </div>
-            </div>
-        </div>
-    </div>
+                        <input type='text' id='min_2' value='1000' hidden>
+                        <input type='text' id='max_2' value='5000' hidden>
+                    
+                        <div class='card'>
+                            <div class='card-body text-center crypto-buy-sell'>
+                                <div class='form-group mt-1'>
+                                    <label class='form-label float-left'>Enter Amount</label>
+                                    <label class='form-label float-right'>Select Payment</label>
 
-    <div class="col-xl-4">
-        <div class="card card-statistics text-center py-5">
-            <div class="card-body pricing-content">
-                <div class="pricing-content-card">
-                    <h5>small</h5>
-                    <h2 class="text-primary pt-3">$80</h2>
-                    <p class="text-primary pb-3">/ Monthly</p>
-                    <ul class="py-2">
-                        <li>post jobs</li>
-                        <li>advanced instructors search</li>
-                        <li>invite candidates</li>
-                        <li>post events</li>
-                        <li>cancel any time</li>
-                    </ul>
-                    <div class="pt-2"><a href="javascript:void(0)" class="btn btn-inverse-secondary btn-round btn-sm">go premium</a></div>
-                </div>
-            </div>
-        </div>
-    </div>
+                                    <div class='input-group'>
+                                        <div class='input-group-prepend'>
+                                            <span class='input-group-text'>$</span>
+                                        </div>
+                                        <input aria-label='Amount (to the nearest dollar)' class='form-control' name='amount' type='number' id='amount_2'>
+                                        <select class='form-control select2 br-0 bg-light nice-select_154' name='payment' id='payment_2' data-placeholder='Choose one (with optgroup)' require>
+                                            <optgroup label='Coins'>
+                                                <option value=''>PAYMENT</option>
+                                                <option value='BITCOIN'>BITCOIN</option>
+                                                <option value='ETHEREUM'>ETHEREUM </option>
+                                                <option value='BINANCE'>BINANCE</option>
+                                                <option value='USDT-TRC20'>USDT(TRC20)</option>
+                                                <option value='USDT-ERC20'>USDT(ERC20)</option>
+                                                <option value='USDT-BEP20'>USDT(BEP20)</option>
+                                                <option value='BUSD'>BUSD</option>
+                                                <option value='TRON'>TRON</option>
+                                                <option value='LITCOIN'>LITCOIN</option>
+                                                <option value='BITCOIN CASH'>BITCOIN-CASH</option>
+                                                <option value='DOGECOIN'>DOGECOIN</option>
+                                                <option value='XRP'>XRP</option>
+                                                <option value='SOLANA'>SOLANA</option>
+                                                <option value='CARDANO'>CARDANO (ADA)</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
 
-    <div class="col-xl-4">
-        <div class="card card-statistics text-center py-5">
-            <div class="card-body pricing-content">
-                <div class="pricing-content-card">
-                    <h5>Premium</h5>
-                    <h2 class="text-primary pt-3">$150</h2>
-                    <p class="text-primary pb-3">/ Monthly</p>
-                    <ul class="py-2">
-                        <li>post jobs</li>
-                        <li>advanced instructors search</li>
-                        <li>invite candidates</li>
-                        <li>post events</li>
-                        <li>cancel any time</li>
-                    </ul>
-                    <div class="pt-2"><a href="javascript:void(0)" class="btn btn-inverse-secondary btn-round btn-sm">go premium</a></div>
-                </div>
-            </div>
-        </div>
-    </div>
+                                    <strong> Daily profit</strong>
+                                    <div class='input-group'>
+                                        <div class='input-group-prepend'>
+                                            <span class='input-group-text'>$</span>
+                                        </div>
+                                        <input aria-label='Amount (to the nearest dollar)' class='form-control' id='BUSINESS' class='form-control bl-0' placeholder='' readonly>
+                                    </div>
 
-    <div class="col-xl-4">
-        <div class="card card-statistics text-center pricing-highlight py-5">
-            <div class="card-body pricing-content">
-                <div class="pricing-content-card">
-                    <h5>starter</h5>
-                    <h2 class="text-primary pt-3">$100</h2>
-                    <p class="text-primary pb-3">/ Monthly</p>
-                    <ul class="py-2">
-                        <li>post jobs</li>
-                        <li>advanced instructors search</li>
-                        <li>invite candidates</li>
-                        <li>post events</li>
-                        <li>cancel any time</li>
-                    </ul>
-                    <div class="pt-2"><a href="javascript:void(0)" class="btn btn-warning btn-round btn-sm">go premium</a></div>
-                </div>
-            </div>
-        </div>
-    </div>
+                                    <strong> Total profit</strong>
+                                    <div class='input-group'>
+                                        <div class='input-group-prepend'>
+                                            <span class='input-group-text'>$</span>
+                                        </div>
+                                        <input aria-label='Amount (to the nearest dollar)' class='form-control' id='5000' class='form-control bl-0' placeholder='' readonly>
+                                    </div>
+                                </div>
+                                    
+                                <div>
+                                    <p class='response2'></p>
+                                    <div class='panel-footer text-center'>
+                                        <button type='submit' onclick='install(this)' class='btn btn-primary' id='invest'>Purchase Now!</button>
+                                    </div>
+                                </div>
 
-    <div class="col-xl-4">
-        <div class="card card-statistics text-center py-5">
-            <div class="card-body pricing-content">
-                <div class="pricing-content-card">
-                    <h5>small</h5>
-                    <h2 class="text-primary pt-3">$80</h2>
-                    <p class="text-primary pb-3">/ Monthly</p>
-                    <ul class="py-2">
-                        <li>post jobs</li>
-                        <li>advanced instructors search</li>
-                        <li>invite candidates</li>
-                        <li>post events</li>
-                        <li>cancel any time</li>
-                    </ul>
-                    <div class="pt-2"><a href="javascript:void(0)" class="btn btn-inverse-secondary btn-round btn-sm">go premium</a></div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
+
 </div>
 <!--pricing-contant 2-end-->
+{% endblock %}
+
+{% block script %}
+<script>
+    let investForms = document.getElementsByClassName('investment-form'),
+    amounts = document.getElementsByClassName('amount');
+
+    console.log(investForms.length);
+
+    for (let i=0; i < amounts.length; i++) {
+        amounts[i].addEventListener('keyup', function(){
+            let amount = parseInt(amounts[i].value),
+            packagePercentage = parseFloat(investForms[i].querySelector('.package-percentage').value),
+            packageDuration = parseInt(investForms[i].querySelector('.package-duration').value);
+
+            let dailyReturn = (packagePercentage/100) * amount,
+            totalReturn = dailyReturn * packageDuration;
+
+            console.log(dailyReturn, totalReturn);
+
+            if (amount == NaN) {
+                dailyReturn = 0;
+                totalReturn = 0;
+            }
+
+            investForms[i].querySelector('.daily-profit').value = dailyReturn;
+            investForms[i].querySelector('.total-profit').value = totalReturn;
+
+        })
+    }
+
+    for (let i=0; i < investForms.length; i++) {
+        investForms[i].addEventListener('submit', function(e){
+            e.preventDefault();
+    
+            let amount = parseInt(this.querySelector('.amount').value),
+            payment = this.querySelector('.payment').value,
+            package = parseInt(this.querySelector('.package').value),
+            // Package Information
+            packagePercentage = parseFloat(this.querySelector('.package-percentage').value),
+            packageDuration = parseInt(this.querySelector('.package-duration').value),
+            packageMin = parseInt(this.querySelector('.package-min').value),
+            packageMax = parseInt(this.querySelector('.package-max').value),
+            // Messages
+            message = this.querySelector('.message'),
+            // Empty Form
+            investmentData;
+
+            if (amount < packageMin) {
+                message.innerText = `Minimum amount is ${packageMin}`;
+            } else if (amount > packageMax) {
+                message.innerText = `Maximum amount is ${packageMax}`;
+            } else if (payment == '' || payment == ' ') {
+                message.innerText = `Payment method is required`;
+            } else {
+                investmentData  = {
+                    'id': generateInvestmentID(),
+                    'package': package,
+                    'payment': payment,
+                    'amount': amount
+                }
+                processInvestment(investmentData);
+            }
+
+        });
+    }
+
+    function processInvestment(data){
+        var url = '/process_investment/'
+
+        console.log('About to send data...')
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({'investment':data})
+        })
+        .then((response)=>{
+            return response.json()
+        })
+        .then((data)=>{
+            console.log('data:', data)
+            window.location.href = 'invoice';
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    }
+
+    // This functions only allows input fields to accept numbers
+    function onlyNumberKey(evt) {
+        // Only ASCII character in that range allowed
+        var ASCIICode = (evt.which) ? evt.which : evt.keyCode
+        if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
+        return false; 
+        return true;
+        // use  onkeypress="return onlyNumberKey(event)" on the input field
+    }
+
+    function generateInvestmentID(){
+        let id = Math.floor(Math.random() * 1000000000 + 1)
+
+        return id
+    }
+</script>
 {% endblock %}

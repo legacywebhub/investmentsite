@@ -5,7 +5,7 @@
 
 <!-- Mirrored from themes.potenzaglobalsolutions.com/html/mentor-bootstrap-4-admin-dashboard-template/auth-register.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 21 Jan 2021 00:35:52 GMT -->
 <head>
-    <title>Register</title>
+    <title>Register | {{company.name}}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="Admin template that can be used to build dashboards for CRM, CMS, etc." />
@@ -65,50 +65,58 @@
                                         <form method="post" class="mt-2 mt-sm-5">
                                             {% csrf_token %}
                                             <div class="row">
-                                                <!-- <div class="col-12 col-sm-6">
+                                                <div class="col-12 col-sm-6">
                                                     <div class="form-group">
                                                         <label class="control-label">First Name*</label>
-                                                        <input type="text" class="form-control" placeholder="First Name" />
+                                                        <input type="text" class="form-control" name="first-name" placeholder="First Name" required/>
                                                     </div>
                                                 </div>
                                                 <div class="col-12 col-sm-6">
                                                     <div class="form-group">
                                                         <label class="control-label">Last Name*</label>
-                                                        <input type="text" class="form-control" placeholder="Last Name" />
-                                                    </div>
-                                                </div> -->
-                                                <div class="col-12">
-                                                    <div class="form-group">
-                                                        <label class="control-label">Email*</label>
-                                                        <input type="email" name="email" class="form-control" placeholder="Email" />
+                                                        <input type="text" class="form-control" name="last-name" placeholder="Last Name" required/>
                                                     </div>
                                                 </div>
                                                 <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Email*</label>
+                                                        <input type="email" name="email" class="form-control" placeholder="Email" required/>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="col-12">
                                                     <div class="form-group">
                                                         <label class="control-label">Username*</label>
                                                         <input type="text" name="username" class="form-control" placeholder="Username" />
                                                     </div>
-                                                </div>
+                                                </div> -->
+                                                <input type="hidden" name="location" id="location" class="form-control" />
                                                 <div class="col-12">
                                                     <div class="form-group">
                                                         <label class="control-label">Password*</label>
-                                                        <input type="password" name="password1" class="form-control" placeholder="Password" />
+                                                        <input type="password" name="password1" class="form-control" placeholder="Password" required/>
                                                     </div>
                                                 </div>
                                                 <div class="col-12">
                                                     <div class="form-group">
                                                         <label class="control-label">Confirm Password*</label>
-                                                        <input type="password" name="password2" class="form-control" placeholder="Confirm Password" />
+                                                        <input type="password" name="password2" class="form-control" placeholder="Confirm Password" required/>
                                                     </div>
                                                 </div>
+                                                {% if upline %}
                                                 <div class="col-12">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="gridCheck" required>
-                                                        <label class="form-check-label" for="gridCheck">
-                                                            I accept terms & policy
-                                                        </label>
+                                                    <div class="form-group">
+                                                        <label class="control-label">Referred By</label>
+                                                        <input type="text" name="ref-code" class="form-control" value="{{upline}}" disabled/>
                                                     </div>
                                                 </div>
+                                                {% else %}
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Referred By</label>
+                                                        <input type="text" name="ref-code" class="form-control" placeholder="Referred by" disabled/>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
                                                 <div class="col-12 mt-3">
                                                     <button class="btn btn-primary text-uppercase" name="register-submit">Sign up</button>
                                                 </div>
@@ -143,6 +151,34 @@
 
     <!-- custom app -->
     <script src="{% static 'assets/js/app.js' %}"></script>
+
+    <script>
+        let handleResults = (position) => {
+            let {latitude, longitude} = position.coords;
+
+            fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=870f0570505b4d4498b7b1d220992532`)
+            .then(response => response.json())
+            .then((data) => {
+                let userLocation = `${data.results[0].components.country}/${data.results[0].components.state}`;
+                console.log(userLocation);
+                document.getElementById('location').value = userLocation;
+                localStorage.setItem('location', userLocation);
+            })
+
+        }
+
+        let userlocation = localStorage.getItem('location');
+
+        if (userlocation == null) {
+            // if there is no location in local storage then fetch and set one
+            navigator.geolocation.getCurrentPosition(handleResults, console.log)
+        } else {
+            // else just set our input value
+            console.log(userlocation);
+            document.getElementById('location').value = userlocation;
+        }
+        
+    </script>
 </body>
 
 

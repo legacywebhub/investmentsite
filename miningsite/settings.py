@@ -27,12 +27,13 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = [] #config('ALLOWED_HOSTS', cast=list)
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] #config('ALLOWED_HOSTS', cast=list)
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -144,3 +146,13 @@ EMAIL_USE_TLS = True
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login path
+LOGIN_URL = 'mining:login'
+
+# Jazzmin dashboard settings
+# JAZZMIN SETTINGS
+JAZZMIN_SETTINGS = {
+    "site_title": "Mining Admin",
+    "site_header": "MINING ADMIN"
+}
