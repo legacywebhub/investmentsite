@@ -1,2 +1,2 @@
 # mining
- mining investment website
+mining investment website

@@ -15,9 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, reverse_lazy
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.conf.urls import handler404
 # For password reset
 from django.contrib.auth import views as auth_views
-yyyyyyyyyy
+
+# Default admin site settings
+admin.site.site_title = "Mining Admin"
+admin.site.site_header = "MINING ADMIN"
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('miningapp.urls')),
@@ -53,3 +61,11 @@ urlpatterns = [
     ), 
     name="password_reset_complete"),
 ]
+
+
+urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+
+
+# Error page settings
+handler404 = 'miningapp.views.error404'
+handler500 = 'miningapp.views.error500'

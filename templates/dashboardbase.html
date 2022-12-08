@@ -5,7 +5,8 @@
 
 <!-- Mirrored from themes.potenzaglobalsolutions.com/html/mentor-bootstrap-4-admin-dashboard-template/ by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 21 Jan 2021 00:29:37 GMT -->
 <head>
-    <title>My account</title>
+    {% block title %}
+    {% endblock %}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="Admin template that can be used to build dashboards for CRM, CMS, etc." />
@@ -20,14 +21,47 @@
     <!-- app style -->
     <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}" />
     <!-- manual style -->
-    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style2.css' %}" />
-    {% block style %}
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/custom.css' %}" />
+    
     <style>
     .sidebar-nav li a{
         color: #fff;
     }
+    .info {
+        color: rgba(2, 2, 211, 0.753);
+    }
+    .success {
+        color: rgba(5, 187, 5, 0.801);
+    }
+    .error {
+        color: rgba(255, 0, 0, 0.801)
+    }
+    .u {
+        text-transform: uppercase;
+    }
     </style>
+
+    {% block style %}
     {% endblock %}
+
+    <script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    </script>
 </head>
 
 <body>
@@ -77,7 +111,7 @@
                                 </li>
                             </ul>
                             <ul class="navbar-nav nav-right ml-auto">
-                                <li class="nav-item dropdown">
+                                <!-- <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="ti ti-email"></i>
                                     </a>
@@ -103,71 +137,6 @@
                                                             </div>
                                                         </a>
                                                     </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">
-                                                            <div class="notification d-flex flex-row align-items-center">
-                                                                <div class="notify-icon bg-img align-self-center">
-                                                                    <img class="img-fluid" src="{% static 'assets/img/avtar/01.jpg" alt="user">
-                                                                </div>
-                                                                <div class="notify-message">
-                                                                    <p class="font-weight-bold">Jimmyimg Leyon</p>
-                                                                    <small>Okay</small>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">
-                                                            <div class="notification d-flex flex-row align-items-center">
-                                                                <div class="notify-icon bg-img align-self-center">
-                                                                    <img class="img-fluid" src="{% static 'assets/img/avtar/02.jpg" alt="user2">
-                                                                </div>
-                                                                <div class="notify-message">
-                                                                    <p class="font-weight-bold">Brainjon Leyon</p>
-                                                                    <small>So, make the decision...</small>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">
-                                                            <div class="notification d-flex flex-row align-items-center">
-                                                                <div class="notify-icon bg-img align-self-center">
-                                                                    <img class="img-fluid" src="assets/img/avtar/04.jpg" alt="user4">
-                                                                </div>
-                                                                <div class="notify-message">
-                                                                    <p class="font-weight-bold">Smithmin Leyon</p>
-                                                                    <small>Thanks</small>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">
-                                                            <div class="notification d-flex flex-row align-items-center">
-                                                                <div class="notify-icon bg-img align-self-center">
-                                                                    <img class="img-fluid" src="assets/img/avtar/05.jpg" alt="user5">
-                                                                </div>
-                                                                <div class="notify-message">
-                                                                    <p class="font-weight-bold">Jennyns Leyon</p>
-                                                                    <small>How are you</small>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">
-                                                            <div class="notification d-flex flex-row align-items-center">
-                                                                <div class="notify-icon bg-img align-self-center">
-                                                                    <img class="img-fluid" src="assets/img/avtar/06.jpg" alt="user6">
-                                                                </div>
-                                                                <div class="notify-message">
-                                                                    <p class="font-weight-bold">Demian Leyon</p>
-                                                                    <small>I like your themes</small>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    </li>
                                                 </ul>
                                             </li>
                                             <li class="dropdown-footer">
@@ -175,7 +144,9 @@
                                             </li>
                                         </ul>
                                     </div>
-                                </li>
+                                </li> -->
+                                {% if request.user.is_authenticated %}
+                                {% if notifications %}
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fe fe-bell"></i>
@@ -188,85 +159,22 @@
                                         <ul>
                                             <li class="dropdown-header bg-gradient p-4 text-white text-left">Notifications
                                                 <a href="#" class="float-right btn btn-square btn-inverse-light btn-xs m-0">
-                                                    <span class="font-13"> Clear all</span></a>
+                                                    <!--<span class="font-13"> Clear all</span></a>-->
                                             </li>
                                             <li class="dropdown-body min-h-240 nicescroll">
                                                 <ul class="scrollbar scroll_dark max-h-240">
+                                                    {% for notification in notifications %}
                                                     <li>
                                                         <a href="javascript:void(0)">
                                                             <div class="notification d-flex flex-row align-items-center">
-                                                                <div class="notify-icon bg-img align-self-center">
-                                                                    <div class="bg-type bg-type-md">
-                                                                        <span>HY</span>
-                                                                    </div>
-                                                                </div>
                                                                 <div class="notify-message">
-                                                                    <p class="font-weight-bold">New registered user</p>
-                                                                    <small>Just now</small>
+                                                                    <p>{{notification.message}}</p>
+                                                                    <small>{{notification.date}}</small>
                                                                 </div>
                                                             </div>
                                                         </a>
                                                     </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">
-                                                            <div class="notification d-flex flex-row align-items-center">
-                                                                <div class="notify-icon bg-img align-self-center">
-                                                                    <div class="bg-type bg-type-md bg-success">
-                                                                        <span>GM</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="notify-message">
-                                                                    <p class="font-weight-bold">New invoice received</p>
-                                                                    <small>22 min</small>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">
-                                                            <div class="notification d-flex flex-row align-items-center">
-                                                                <div class="notify-icon bg-img align-self-center">
-                                                                    <div class="bg-type bg-type-md bg-danger">
-                                                                        <span>FR</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="notify-message">
-                                                                    <p class="font-weight-bold">Server error report</p>
-                                                                    <small>7 min</small>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">
-                                                            <div class="notification d-flex flex-row align-items-center">
-                                                                <div class="notify-icon bg-img align-self-center">
-                                                                    <div class="bg-type bg-type-md bg-info">
-                                                                        <span>HT</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="notify-message">
-                                                                    <p class="font-weight-bold">Database report</p>
-                                                                    <small>1 day</small>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="javascript:void(0)">
-                                                            <div class="notification d-flex flex-row align-items-center">
-                                                                <div class="notify-icon bg-img align-self-center">
-                                                                    <div class="bg-type bg-type-md">
-                                                                        <span>DE</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="notify-message">
-                                                                    <p class="font-weight-bold">Order confirmation</p>
-                                                                    <small>2 day</small>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    </li>
+                                                    {% endfor %}
                                                 </ul>
                                             </li>
                                             <li class="dropdown-footer">
@@ -276,6 +184,7 @@
                                         </ul>
                                     </div>
                                 </li>
+                                {% endif %}
                                 <li class="nav-item dropdown user-profile">
                                     <a href="javascript:void(0)" class="nav-link dropdown-toggle " id="navbarDropdown4" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fas fa-user"></i>
@@ -285,15 +194,15 @@
                                         <div class="bg-gradient px-4 py-3">
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <div class="mr-1">
-                                                    <h4 class="text-white mb-0">Alice Williams</h4>
-                                                    <small class="text-white">Henry@example.com</small>
+                                                    <h4 class="text-white mb-0">{{request.user.fullname}}</h4>
+                                                    <small class="text-white">{{request.user.email}}</small>
                                                 </div>
-                                                <a href="#" class="text-white font-20 tooltip-wrapper" data-toggle="tooltip" data-placement="top" title="" data-original-title="Logout"> <i
-                                                                class="zmdi zmdi-power"></i></a>
+                                                <a href="{% url 'mining:logout' %}" class="text-white font-20 tooltip-wrapper" data-toggle="tooltip" data-placement="top" title="" data-original-title="Logout">
+                                                    <i class="zmdi zmdi-power"></i></a>
                                             </div>
                                         </div>
                                         <div class="p-4">
-                                            <a class="dropdown-item d-flex nav-link" href="javascript:void(0)">
+                                            <a class="dropdown-item d-flex nav-link" href="{% url 'mining:profile' %}">
                                                 <i class="fa fa-user pr-2 text-success"></i> Profile</a>
                                             <a class="dropdown-item d-flex nav-link" href="javascript:void(0)">
                                                 <i class="fa fa-envelope pr-2 text-primary"></i> Inbox
@@ -321,6 +230,7 @@
                                         </div>
                                     </div>
                                 </li>
+                                {% endif %}
                             </ul>
                         </div>
                     </div>
@@ -339,7 +249,7 @@
                     <div class="sidebar-nav scrollbar scroll_light">
                         <ul class="metismenu " id="sidebarNav">
                             <li class="nav-static-title">Dashboard</li>
-                            <li class="active"><a href="javascript:void(0)"><i class="ti ti-desktop"></i><span class="nav-title"> Dashboard</span></a> </li>
+                            <li class="active"><a href="{% url 'mining:account' %}"><i class="ti ti-desktop"></i><span class="nav-title"> Dashboard</span></a> </li>
                             <li class="nav-static-title">User activities</li>
                             <li>
                                 <a class="has-arrow" href="javascript:void(0)" aria-expanded="false">
@@ -348,8 +258,8 @@
                                     <!-- <span class="nav-label label label-danger">9</span> -->
                                 </a>
                                 <ul aria-expanded="false">
-                                    <li> <a href='index-ecommerce.html'>Create a mining plan</a> </li>
-                                    <li> <a href='index-car-dealer.html'>Mining history</a> </li>
+                                    <li> <a href="{% url 'mining:invest' %}">Create a mining plan</a> </li>
+                                    <li> <a href="{% url 'mining:invest_history' %}">Mining history</a> </li>
                                 </ul>
                             </li>
                             <li>
@@ -364,8 +274,8 @@
                                 </ul>
                             </li>
                             <li class="nav-static-title">Settings</li>
-                            <li><a href="#"><i class="ti ti-user"></i><span class="nav-title"> Profile</span></a> </li>
-                            <li><a href="#"><i class="ti ti-link"></i><span class="nav-title"> Affiliates</span></a> </li>
+                            <li><a href="{% url 'mining:profile' %}"><i class="ti ti-user"></i><span class="nav-title"> Profile</span></a> </li>
+                            <li><a href="{% url 'mining:affiliates' %}"><i class="ti ti-link"></i><span class="nav-title"> Affiliates</span></a> </li>
                             <li><a href="#"><i class="ti ti-bell"></i><span class="nav-title"> Notification</span></a></li>
                             <li><a href="{% url 'mining:logout' %}"><i class="ti ti-power-off"></i><span class="nav-title"> Logout</span></a></li>
                         </ul>
@@ -397,7 +307,7 @@
                         <p>&copy; Copyright 2019. All rights reserved.</p>
                     </div>
                     <div class="col  col-sm-6 ml-sm-auto text-center text-sm-right">
-                        <p>Hand-crafted made with by Potenza</p>
+                        <p>mywebsite.com</p>
                     </div>
                 </div>
             </footer>
