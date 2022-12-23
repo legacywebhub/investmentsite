@@ -154,27 +154,27 @@ class Profile(models.Model):
 
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
-    balance = models.FloatField(default=0, null=False)
-    referral_balance = models.FloatField(default=0, null=False)
+    balance = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=False, blank=False)
+    referral_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=False, blank=False)
 
     @property
     # Function to return TOTAL ACCOUNT BALANCE
     def total_balance(self):
-        return self.balance + self.referral_balance
+        return round(self.balance + self.referral_balance, 2)
 
     @property
     # Function to return CURRENT ACTIVE/APPROVED INVESTMENTS' RETURNS
     def active_investments(self):
         investments = Investment.objects.filter(user=self.user, status='approved')
         total = sum([item.returns for item in investments])
-        return  total
+        return  round(total, 2)
 
     @property
     # Function to return TOTAL AMOUNT OF ALL PENDING/UNAPPROVED INVESTMENTS
     def pending_investments(self):
         investments = Investment.objects.filter(user=self.user, status='pending')
         total = sum([item.amount for item in investments])
-        return  total
+        return  round(total, 2)
 
     @property
     # Function to return TOTAL RETURNS OF ACTIVE & COMPLETED INVESTMENTS
@@ -183,21 +183,21 @@ class Account(models.Model):
         completed_investments = Investment.objects.filter(user=self.user, status='completed')
         investments = list(approved_investments) + list(completed_investments)
         total = sum([item.returns for item in investments])
-        return  total
+        return  round(total, 2)
 
     @property
     # Function to return TOTAL PENDING WITHDRAWALS
     def pending_withdrawals(self):
         withdrawals = Withdraw.objects.filter(user=self.user, status='pending')
         total = sum([item.amount for item in withdrawals])
-        return  total
+        return  round(total, 2)
 
     @property
     # Function to return TOTAL COMPLETED WITHDRAWALS
     def completed_withdrawals(self):
         withdrawals = Withdraw.objects.filter(user=self.user, status='approved')
         total = sum([item.amount for item in withdrawals])
-        return  total
+        return  round(total, 2)
 
     def __str__(self):
         if self.user.fullname:
@@ -262,10 +262,10 @@ class CompanyInfo(models.Model):
 
 class Package(models.Model):
     package = models.CharField(max_length=25, unique=True, blank=False, null=False)
-    daily_profit_percentage = models.FloatField(blank=False, null=False, help_text="in percentage(%)")
+    daily_profit_percentage = models.DecimalField(max_digits=3, decimal_places=1, blank=False, null=False, help_text="in percentage(%)")
     minimum_amount = models.PositiveIntegerField(blank=False, null=False)
     maximum_amount = models.PositiveIntegerField(blank=False, null=False)
-    referral_commission = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(0, 100)], default=10, blank=False, null=False)
+    referral_commission = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(0, 100)], default=10, blank=False, null=False, help_text="in percentage %")
     duration_in_days = models.PositiveSmallIntegerField(blank=False, null=False, help_text="in_days")
 
     def __str__(self):
@@ -303,9 +303,9 @@ class Investment(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     package = models.ForeignKey(Package, on_delete=models.SET_NULL, null=True)
     payment_method = models.CharField(max_length=60, null=False, blank=False)
-    amount = models.FloatField(null=False, blank=False)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, null=False, blank=False)
     status = models.CharField(max_length=60, choices=status, default='pending')
-    returns = models.FloatField(default=0, null=False, blank=False)
+    returns = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=False, blank=False)
     approved_date = models.DateTimeField(null=True, blank=True)
     end_date =  models.DateTimeField(null=True, blank=True, help_text="This field is calculated and depends on approved date")
 
@@ -334,7 +334,7 @@ class Investment(models.Model):
                 notification.save()
                 # Adding referral commission to upline
                 if self.user.profile.upline:
-                    commission = 0.1 * self.amount
+                    commission = round(0.1 * self.amount, 2)
                     upliner_account = Account.objects.get(user=self.user.profile.upline)
                     updateAccount(upliner_account, "credit", commission)
             # Saving
@@ -353,24 +353,24 @@ class Investment(models.Model):
     # This defines daily profit for investment amount
     def daily_profit(self):
         daily_profit = (self.daily_profit_percentage/100) * self.amount
-        return daily_profit
+        return round(daily_profit, 2)
 
     @property
     # This defines daily profit for investment amount
     def total_profit(self):
         total_profit = self.daily_profit * self.package.duration_in_days
-        return total_profit
+        return round(total_profit, 2)
         
     @property
     # This is investment amount + profits
     def roi(self):
-        return self.amount + self.total_profit
+        return round(self.amount + self.total_profit, 2)
 
     @property
     # This is the amount that accumulates for investor
     # for each duration day
     def daily_roi(self):
-        return self.roi/int(self.package.duration_in_days)
+        return round(self.roi/self.package.duration_in_days, 2)
 
     # Payment address to be used for investment
     @property
@@ -450,7 +450,7 @@ class Investment(models.Model):
 
 class Deposit(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    amount = models.FloatField(null=False, blank=False)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, null=False, blank=False)
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -466,7 +466,7 @@ class Withdraw(models.Model):
     )
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     payment_method = models.CharField(max_length=60, null=True, blank=True)
-    amount = models.FloatField(null=False, blank=False)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, null=False, blank=False)
     payment_address = models.CharField(max_length=60, null=True, blank=True)
     network = models.CharField(max_length=60, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)

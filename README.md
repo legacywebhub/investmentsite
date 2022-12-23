@@ -4,13 +4,15 @@ Investment package increments profit everyday and returns capital + profits on t
 
 
 # Technical details
+* How investment process works is that it starts to drop daily profits from the approval date and finally drops RIO(Returns On Investment) which
+is capital + total calculated profits, after end date of investment
 * Function to run investment process to increment profit till end of investment was implemented without use of background task running services 
 such as celery, redis, crontab, django-scheduler etc
 * Function to delete notifications of user longer than 3days was implemented using similar method to the above
-* Diverse pages were made to run either of the above functions rather than both to reduce load time(speed)
+* Diverse pages were made to run either of the above functions rather than both to reduce load time(increase speed)
 * A single function handles account credit and debit, saves the transaction record and sends appropriate notification 
-* Users can get their investment details in PDF
-* Gets users location and timezone on sign up
+* Users can get their investment details in PDF format
+* Gets users location and timezone on sign up and profile settings
 * Ajax and animations
 
 
@@ -22,8 +24,8 @@ such as celery, redis, crontab, django-scheduler etc
 * Ajax functionalities to communicate to backend without page reload
 * Notification features and auto delete functionality
 * Beautiful admin dashboard using django-jazzmin
-* Error 404 and 500 pages implemented to handle error pages.
-* Configured to use cloudinary cloud storage to serve media files.
+* Error 404 and 500 pages implemented to handle error pages
+* Configured to use cloudinary cloud storage to serve media files
 * Password reset functionality
 
 

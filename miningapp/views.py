@@ -623,12 +623,12 @@ def investmentPDF(request, investment_id):
     textob.setFont("Helvetica", 12)
 
     # Converting investment date according to user timezone
-    date = investment.date.astimezone(pytz.timezone(investment.user.profile.timezone))
+    date = investment.date.astimezone(pytz.timezone(investment.user.profile.timezone)).strftime("%b %d %Y %H:%M:%S") #.strftime("%d/%m/%Y, %H:%M:%S")
 
     if investment.status == 'approved':
         # Converting investment approval and end dates according to user timezone
-        approved_date = investment.approved_date.astimezone(pytz.timezone(investment.user.profile.timezone))
-        end_date = investment.end_date.astimezone(pytz.timezone(investment.user.profile.timezone))
+        approved_date = investment.approved_date.astimezone(pytz.timezone(investment.user.profile.timezone)).strftime("%b %d %Y %H:%M:%S")
+        end_date = investment.end_date.astimezone(pytz.timezone(investment.user.profile.timezone)).strftime("%b %d %Y %H:%M:%S")
 
         #Add lines of text
         lines = [
