@@ -25,7 +25,13 @@ class CompanyInfoAdmin(admin.ModelAdmin):
 class DepositAdmin(admin.ModelAdmin):
     list_display = ( 'date', 'user', 'amount')
     list_display_links = ('date',)
+    list_filter = ('date', 'user',)
     list_per_page = 20
+
+    # Render filtered options only after 5 characters were entered
+    filter_input_length = {
+        "user": 3,
+    }
 
 
 class InvestmentAdmin(admin.ModelAdmin):
@@ -113,7 +119,15 @@ class ProfileAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     list_display = ( 'fullname', 'email',)
     list_display_links = ('fullname', 'email')
+    list_filter = ('first_name', 'last_name', 'email',)
     list_per_page = 20
+
+    # Render filtered options only after 5 characters were entered
+    filter_input_length = {
+        "first_name": 3,
+        "last_name": 3,
+        "email": 3
+    }
 
 
 
@@ -123,11 +137,16 @@ class WithdrawAdmin(admin.ModelAdmin):
     list_filter = ('date', 'user', 'status', 'payment_method',)
     list_per_page = 20
 
+    # Render filtered options only after 5 characters were entered
+    filter_input_length = {
+        "user": 3,
+    }
+
 
 # Register your models here.
 admin.site.register(Account, AccountAdmin)
 admin.site.register(CompanyInfo, CompanyInfoAdmin)
-admin.site.register(Deposit)
+admin.site.register(Deposit, DepositAdmin)
 admin.site.register(Investment, InvestmentAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Notification, NotificationAdmin)
