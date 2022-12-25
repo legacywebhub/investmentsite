@@ -2,12 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, FileResponse
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse_lazy
 from .models import *
 from .utils import updateInvestment, deleteOldNotifications
 import json
+# Mailing imports
+from django.core.mail import send_mail, EmailMessage
+from django.template.loader import render_to_string
 # Auth imports
 from django.contrib.auth.models import auth
 from django.contrib.auth.decorators import login_required
@@ -59,7 +61,16 @@ def register(request):
                         if location != '' or location != ' ':
                             profile.location = location
                         profile.save()
-                        messages.success(request, 'Your account has successfully been created... you can now sign in!')
+                        # Send success email
+                        try:
+                            html_content = render_to_string('email_welcome.html', {'user':user, 'company':company})
+                            email = EmailMessage(f'{user.first_name}, your account was successfully created', html_content, company.email, [user.email,])
+                            email.content_subtype = 'html'
+                            email.fail_silently = False
+                            email.send()
+                        except Exception as e:
+                            print(e)
+                        messages.success(request, f'{user.first_name}, your account has successfully been created... you can now sign in!')
                         return redirect('mining:login')
                     else:
                         messages.error(request, 'Password length cannot be less than 7... Please try again')
@@ -108,7 +119,16 @@ def uplineRegister(request, refcode):
                         # Updating downlines for upline
                         upline.downlines.add(user)
                         upline.save()
-                        messages.success(request, 'Your account has successfully been created... you can now sign in!')
+                        # Send success email
+                        try:
+                            html_content = render_to_string('email_welcome.html', {'user':user, 'company':company})
+                            email = EmailMessage(f'{user.first_name}, your account was successfully created', html_content, company.email, [user.email,])
+                            email.content_subtype = 'html'
+                            email.fail_silently = False
+                            email.send()
+                        except Exception as e:
+                            print(e)
+                        messages.success(request, f'{user.first_name}, your account has successfully been created... you can now sign in!')
                         return redirect('mining:login')
                     else:
                         messages.error(request, 'Password length cannot be less than 7... Please try again')
@@ -428,16 +448,11 @@ def createInvest(request):
 def invoice(request, investment_id):
     # run check and update investments
     updateInvestment(request.user)
+    investment = get_object_or_404(Investment, investment_id=investment_id)
     company = CompanyInfo.objects.last()
     notifications = Notification.objects.filter(user=request.user)
     total_notifications = notifications.count
     recent_notifications = notifications.order_by('-date')[:5]
-    try:
-        investment = Investment.objects.get(investment_id=investment_id)
-        print(investment)
-    except Exception as e:
-        print(e)
-        return render('/account/invest/')
 
     context = {
         'company':company,
@@ -519,6 +534,7 @@ def error500(request):
 
 # View to start new mining investment
 def processInvestment(request):
+    company = CompanyInfo.objects.last()
     data = json.loads(request.body)
     investment_id = data['investment']['id']
     package_id = int(data['investment']['package'])
@@ -535,6 +551,17 @@ def processInvestment(request):
             amount = amount
         )
         investment.save()
+
+        # Send success mail for placing investment
+        try:
+            html_content = render_to_string('email_investment.html', {'investment':investment, 'company':company})
+            email = EmailMessage(f'Your mining ${investment.amount} was successfully placed', html_content, company.email, [request.user.email,])
+            email.content_subtype = 'html'
+            email.fail_silently = False
+            email.send()
+            print('mailing successful')
+        except Exception as e:
+            print('error while mailing: ', e)
 
         response = {
             'status': 'success',

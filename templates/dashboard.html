@@ -187,7 +187,7 @@
         <div class="card card-statistics h-100 m-b-0 bg-dark">
             <div class="card-body" style="flex-direction: column; align-items:flex-start; justify-content: space-between;">
                 <big class="text-uppercase d-block mt-1">Referral link</big>
-                <div><input type="text" id="referral-address" value="http://127.0.0.1:8000/register/{{request.user.profile.ref_code}}/"><button class="btn-sm btn-primary" id="copy-button"><i class="fas fa-paste"></i></button><div/>           
+                <div><input type="text" id="referral-address" value="http://{{company.site_domain}}/register/{{request.user.profile.ref_code}}/"><button class="btn-sm btn-primary" id="copy-button"><i class="fas fa-paste"></i></button></div>          
             </div>
         </div>
     </div>

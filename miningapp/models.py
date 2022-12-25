@@ -3,6 +3,9 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 import datetime, pytz
 from .utils import generateRefCode, updateAccount
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 
 
 # Create your models here.
@@ -214,40 +217,28 @@ class Account(models.Model):
 
 class CompanyInfo(models.Model):
     name = models.CharField(max_length=150, blank=False, null=False)
+    site_domain = models.CharField(max_length=150, blank=False, null=False, help_text="site url/link i.e miningsite.com")
     logo = models.ImageField(upload_to="images/company", blank=True, null=True)
     address = models.CharField(max_length=150, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=25, blank=True, null=True)
+    certificate = models.ImageField(upload_to="images/company", blank=True, null=True)
+    document = models.FileField(upload_to='document', blank=True, null=True, storage=RawMediaCloudinaryStorage())
     bitcoin_address = models.CharField(max_length=200, blank=True, null=True)
-    bitcoin_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     ethereum_address = models.CharField(max_length=200, blank=True, null=True)
-    ethereum_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     litecoin_address = models.CharField(max_length=200, blank=True, null=True)
-    litecoin_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     bitcoincash_address = models.CharField(max_length=200, blank=True, null=True)
-    bitcoincash_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     binance_address = models.CharField(max_length=200, blank=True, null=True)
-    binance_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     dogecoin_address = models.CharField(max_length=200, blank=True, null=True)
-    dogecoin_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     dashcoin_address = models.CharField(max_length=200, blank=True, null=True)
-    dashcoin_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     usdt_trc20_address = models.CharField(max_length=200, blank=True, null=True)
-    usdt_trc20_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     usdt_erc20_address = models.CharField(max_length=200, blank=True, null=True)
-    usdt_erc20_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     usdt_bep20_address = models.CharField(max_length=200, blank=True, null=True)
-    usdt_bep20_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     busd_address = models.CharField(max_length=200, blank=True, null=True)
-    busd_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     tron_address = models.CharField(max_length=200, blank=True, null=True)
-    tron_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     xrp_address = models.CharField(max_length=200, blank=True, null=True)
-    xrp_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     solana_address = models.CharField(max_length=200, blank=True, null=True)
-    solana_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
     cordano_address = models.CharField(max_length=200, blank=True, null=True)
-    cordano_qrcode = models.ImageField(upload_to="images/company", blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -329,6 +320,16 @@ class Investment(models.Model):
                 self.approved_date = datetime.datetime.now(tz=pytz.UTC)
                 # Setting end date to date and time after package duration from approved date
                 self.end_date = self.approved_date + datetime.timedelta(days=self.package.duration_in_days)
+                # Sending approval mail
+                try:
+                    company = CompanyInfo.objects.last()
+                    html_content = render_to_string('email_approved.html', {'user':self.user, 'company':company})
+                    email = EmailMessage(f'Dear {self.user.first_name}, your mining package of ${self.amount} and ID {self.investment_id} has been approved', html_content, company.email, [self.user.email,])
+                    email.content_subtype = 'html'
+                    email.fail_silently = False
+                    email.send()
+                except Exception as e:
+                    print(e)
                 # Notifying user of approved investment
                 notification = Notification.objects.create(user=self.user, message=f"Your investment of ${self.amount}({self.payment_method}) and ID - {self.investment_id} has successfully been approved")
                 notification.save()

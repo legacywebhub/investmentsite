@@ -1,6 +1,7 @@
 from . import models
-import datetime, pytz, time
-import uuid 
+import datetime, pytz, time, uuid
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 
 def generateRefCode():
@@ -80,6 +81,16 @@ def updateInvestment(param):
                 current_investment.returns = current_investment.roi
                 current_investment.status = "completed"
                 updateAccount(account, "credit", current_investment.roi)
+                # Sending success mail
+                try:
+                    company = models.CompanyInfo.objects.last()
+                    html_content = render_to_string('email_congrats.html', {'investment':investment, 'company':company})
+                    email = EmailMessage(f'Congrats.. Your mining package of ${investment.amount} has successfully been completed', html_content, company.email, [investment.user.email,])
+                    email.content_subtype = 'html'
+                    email.fail_silently = False
+                    email.send()
+                except Exception as e:
+                    print(e)
                 # Creating notification of completion
                 notification = models.Notification.objects.create(
                     user=account.user, 

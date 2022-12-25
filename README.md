@@ -13,6 +13,7 @@ such as celery, redis, crontab, django-scheduler etc
 * A single function handles account credit and debit, saves the transaction record and sends appropriate notification 
 * Users can get their investment details in PDF format
 * Gets users location and timezone on sign up and profile settings
+* crypto qr code are generated from address
 * Ajax and animations
 
 
@@ -39,21 +40,30 @@ such as celery, redis, crontab, django-scheduler etc
 # Pages
 Project contains 25+ pages in total outside admin dashboard which includes index, contact, faq, register, login,
 dashboard, profile, update password, create investment, invoice, investment history, withdraw, withdraw history, notifications,
-affiliates, success, error pages(404 and 500) and password reset pages.
+affiliates, success, error pages(404 and 500), password reset pages, and email templates.
 
 
 # Libraries used
 // Dependent libraries
+python==3.7.0
 Django==3.2.2
-Pillow==9.2.0
+Pillow==8.0.0
 django-cloudinary-storage==0.3.0
 python-magic==0.4.25
 python-decouple==3.6
 django-jazzmin>=2.6.0
-reportlab==3.6.10
+reportlab==3.5.50
 whitenoise==5.3.0
 gunicorn==20.1.0
 
 // Non dependent libraries
 psycopg2==2.9.2
 dj-database-url==0.5.0
+mysqlclient==2.0.3
+PyMySQL==1.0.2
+
+
+# Notes
+* To run on cpanel host, some packages are not compatible so older versions of libraries are used
+* Pillow, pscopg2, reportlab and mysqlclient(for mySQLdb) had conflicts
+* mysqlclient requires an extra setting with PyMySQL on settings.py
