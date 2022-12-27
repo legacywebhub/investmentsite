@@ -369,6 +369,15 @@
 </script>
 
 
+<!-- Script to prevent DDOS attacks(form resubmission on reload) -->
+<script>
+if (window.history.replaceState){
+    window.history.replaceState(null, null, window.location.href);
+}
+// add onunload='' to the body tag of base page  and autocomplete="off" on form tags
+</script>
+
+
 
 
 

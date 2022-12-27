@@ -57,7 +57,7 @@
                         <li>{{package.referral_commission}}% REFERRAL COMISSION</li>
                         <li>24/7 SUPPORT</li>
                     </ul>
-                    <form id='install_form2' method='POST' class="investment-form">
+                    <form id='install_form2' method='POST' class="investment-form" autocomplete="off">
                         {% csrf_token %}
 
                         <input type='text' name='investment-id' class='investment-id' value="generateInvestmentID()" hidden>
@@ -77,7 +77,7 @@
                                         <div class='input-group-prepend'>
                                             <span class='input-group-text'>$</span>
                                         </div>
-                                        <input aria-label='Investment Amount'  onkeypress="return onlyNumberKey(event)" class='form-control amount' name='amount' type='number' require>
+                                        <input aria-label='Investment Amount' maxlength="12"  onkeypress="return onlyNumberKey(event)" class='form-control amount' name='amount' type='number' require>
                                         <select class='form-control select2 br-0 bg-light nice-select_154 payment' name='payment' data-placeholder='Choose a payment method' require>
                                             <optgroup label='Coins'>
                                                 <option value=''>PAYMENT</option>
@@ -270,8 +270,6 @@
             investBtn = this.querySelector('.invest-button'),
             // Empty form data
             investmentData;
-
-            console.log(investBtn.childEelment);
 
             if (amount < packageMin) {
                 // If amount is lesser than package minimum amount

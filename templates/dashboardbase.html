@@ -71,7 +71,7 @@
     </script>
 </head>
 
-<body>
+<body onunload=''>
     <!-- begin app -->
     <div class="app">
         <!-- begin app-wrap -->
@@ -333,6 +333,13 @@
     <script src="{% static 'assets/js/all.min.js' %}"></script>
     <!-- custom app -->
     <script src="{% static 'assets/js/app.js' %}"></script>
+    <!-- Script to prevent DDOS attacks(form resubmission on reload) -->
+    <script>
+        if (window.history.replaceState){
+        window.history.replaceState(null, null, window.location.href);
+        }
+        // ensure to add onunload='' to the body tag and autocomplete="off" on form tags
+    </script>
     {% block script %}
     {% endblock %}
 </body>

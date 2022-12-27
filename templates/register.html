@@ -32,7 +32,7 @@
         </style>
 </head>
 
-<body class="bg-white">
+<body class="bg-white" onunload="">
     <!-- begin app -->
     <div class="app">
         <!-- begin app-wrap -->
@@ -68,39 +68,39 @@
                                                 <div class="col-12 col-sm-6">
                                                     <div class="form-group">
                                                         <label class="control-label">First Name*</label>
-                                                        <input type="text" class="form-control" name="first-name" placeholder="First Name" required/>
+                                                        <input type="text" maxlength="25" class="form-control" name="first-name" placeholder="First Name" required/>
                                                     </div>
                                                 </div>
                                                 <div class="col-12 col-sm-6">
                                                     <div class="form-group">
                                                         <label class="control-label">Last Name*</label>
-                                                        <input type="text" class="form-control" name="last-name" placeholder="Last Name" required/>
+                                                        <input type="text" maxlength="25" class="form-control" name="last-name" placeholder="Last Name" required/>
                                                     </div>
                                                 </div>
                                                 <div class="col-12">
                                                     <div class="form-group">
                                                         <label class="control-label">Email*</label>
-                                                        <input type="email" name="email" class="form-control" placeholder="Email" required/>
+                                                        <input type="email" maxlength="25" name="email" class="form-control" placeholder="Email" required/>
                                                     </div>
                                                 </div>
                                                 <!-- <div class="col-12">
                                                     <div class="form-group">
                                                         <label class="control-label">Username*</label>
-                                                        <input type="text" name="username" class="form-control" placeholder="Username" />
+                                                        <input type="text" maxlength="25" name="username" class="form-control" placeholder="Username" />
                                                     </div>
                                                 </div> -->
-                                                <input type="hidden" name="location" id="location" class="form-control" />
-                                                <input type="hidden" name="timezone" id="timezone" class="form-control" />
+                                                <input type="hidden" name="location" maxlength="30" id="location" class="form-control" />
+                                                <input type="hidden" name="timezone" maxlength="30" id="timezone" class="form-control" />
                                                 <div class="col-12">
                                                     <div class="form-group">
                                                         <label class="control-label">Password*</label>
-                                                        <input type="password" name="password1" class="form-control" placeholder="Password" required/>
+                                                        <input type="password" maxlength="20" name="password1" class="form-control" placeholder="Password" required/>
                                                     </div>
                                                 </div>
                                                 <div class="col-12">
                                                     <div class="form-group">
                                                         <label class="control-label">Confirm Password*</label>
-                                                        <input type="password" name="password2" class="form-control" placeholder="Confirm Password" required/>
+                                                        <input type="password" maxlength="20" name="password2" class="form-control" placeholder="Confirm Password" required/>
                                                     </div>
                                                 </div>
                                                 {% if upline %}
