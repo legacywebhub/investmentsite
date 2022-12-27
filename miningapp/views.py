@@ -6,9 +6,10 @@ from django.conf import settings
 from django.urls import reverse_lazy
 from .models import *
 from .utils import updateInvestment, deleteOldNotifications
+from decimal import Decimal
 import json
 # Mailing imports
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 # Auth imports
 from django.contrib.auth.models import auth
@@ -27,7 +28,8 @@ from reportlab.lib.pagesizes import letter
 
 def index(request):
     company = CompanyInfo.objects.last()
-    return render(request, 'index.html', {'company':company})
+    packages = Package.objects.all
+    return render(request, 'index.html', {'company':company, 'packages':packages})
 
 
 
@@ -190,7 +192,7 @@ def contact(request):
                 messages.info(request, 'Your email is not valid')
             else:
                 try:
-                    html_content = render_to_string('email_template.html', {'subject':subject, 'message':message})
+                    html_content = render_to_string('email_template.html', {'subject':subject, 'message':message, 'company':company})
                     email = EmailMessage(subject, html_content, email, [company.email, settings.EMAIL_HOST_USER])
                     email.content_subtype = 'html'
                     email.fail_silently = False
@@ -279,6 +281,7 @@ def profile(request):
             profile.timezone = timezone
             profile.save()
             messages.success(request, 'Details successfully updated')
+            return redirect('mining:profile')
     context = {
         'user':user, 
         'company':company, 
@@ -556,7 +559,7 @@ def processInvestment(request):
         # Send success mail for placing investment
         try:
             html_content = render_to_string('email_investment.html', {'investment':investment, 'company':company})
-            email = EmailMessage(f'Your mining ${investment.amount} was successfully placed', html_content, company.email, [request.user.email,])
+            email = EmailMessage(f'Your mining package ${investment.amount} was successfully placed', html_content, company.email, [request.user.email,])
             email.content_subtype = 'html'
             email.fail_silently = False
             email.send()
@@ -566,14 +569,14 @@ def processInvestment(request):
 
         response = {
             'status': 'success',
-            'message': 'Mining Investment was successfully placed',
+            'message': 'Mining package was successfully placed',
             'invoice-url': f'/account/invest/invoice/{investment.investment_id}/'
         }
     except Exception as e:
         print(e)
         response = {
             'status': 'error',
-            'message': 'Sorry there was an error while placing investment',
+            'message': 'Sorry there was an error while placing mining package',
             'error-message': e
         }
     return JsonResponse(response, safe=False)
@@ -582,9 +585,8 @@ def processInvestment(request):
 # View to invest from account balance
 def investFromBalance(request):
     data = json.loads(request.body)
-    print(data)
     investment_id = data['investment']['id']
-    amount = int(data['investment']['amount'])
+    amount = Decimal(data['investment']['amount'])
     account = Account.objects.get(user=request.user)
     investment = Investment.objects.get(investment_id=investment_id)
 
@@ -597,7 +599,7 @@ def investFromBalance(request):
             
             response = {
                 'status': 'success',
-                'message': "Mining has been approved and successfully started",
+                'message': "Mining has been successfully approved and started",
             }
         else:
             response = {
@@ -619,11 +621,11 @@ def confirmPayment(request):
     company = CompanyInfo.objects.last()
     investment = Investment.objects.get(investment_id=int(data['id']))
     subject = f'PAYMENT CONFIRMATION FOR INVESTMENT {investment.investment_id}'
-    message = f'*Investment ID - {investment.investment_id}\n*Payment Method - {investment.payment_method}\n*Amount - {investment.amount}\n*Date/Time - {investment.date}'
+    message = f'Hello Admin, you have an investment confirmation request to process with the following details:<br><br>*Investment ID - {investment.investment_id}<br><hr>*Payment Method - {investment.payment_method}<br><hr>*Amount - {investment.amount}<br><hr>*Date/Time - {investment.date}<br><hr><br><br>'
 
     # Trying to notify company or admins via mail
     try:
-        html_content = render_to_string('email_template.html', {'subject':subject, 'message':message})
+        html_content = render_to_string('email_template.html', {'subject':subject, 'message':message, 'company':company})
         email = EmailMessage(subject, html_content, request.user.email, [company.email, settings.EMAIL_HOST_USER])
         email.content_subtype = 'html'
         email.fail_silently = False

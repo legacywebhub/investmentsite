@@ -93,7 +93,8 @@ def updateInvestment(param):
                     print(e)
                 # Creating notification of completion
                 notification = models.Notification.objects.create(
-                    user=account.user, 
+                    date = current_investment.end_date,
+                    user=account.user,
                     message=f'Your mining package ID - {current_investment.investment_id}, amount - {current_investment.amount} has been completed and ${current_investment.roi} has been credited to your balance.'
                 )
                 notification.save()

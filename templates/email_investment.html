@@ -129,6 +129,10 @@
       text-decoration: none;
     }
 
+    .header h3 {
+      text-transform: uppercase;
+    }
+
     /* ----- Footer ----- */
 
     .footer a {
@@ -175,7 +179,13 @@
               <table class='full-width-gmail-android' cellspacing='0' cellpadding='0' border='0' width='100%'>
                 <tr>
                   <td class='header center' width='100%'>
-                    <img src="{{company.logo.url}}" width='50px'><br>
+                    {% if company.logo %}
+                    <img src='{{company.logo.url}}' width='50px;'><br>
+                    {% elif company.name %}
+                    <h3>{{company.name}}</h3>
+                    {% else %}
+                    <h3>{{company.site_domain}}</h3>
+                    {% endif %}
                   </td>
                 </tr>
               </table>
@@ -203,7 +213,7 @@
                   </tr>
                   <tr>
                     <td style='padding-bottom:20px;'>
-                     Hello {{investment.user.fullname}} you just initiated an investment request on your account, see details below !. <br>
+                     Hello {{investment.user.fullname}}, you just initiated an investment request on your account, see details below: <br>
                       <br>
                      <b>PACKAGE </b><br>
                         {{investment.package.package}}
@@ -262,7 +272,7 @@
                   <tr>
                     <td style='padding-top:5px; vertical-align:top;'>
                      * Never give your login access to anyone<br>
-                     * Contact our support at <a href='MailTo:$email1'>{{company.email}} </a> if you need any assistance<br>
+                     * Contact our support at <a href='MailTo:{{company.email}}'>{{company.email}} </a> if you need any assistance<br>
                      <b>Enjoy your journey {{investment.user.first_name}}</b>
                     </td>
                   </tr>
