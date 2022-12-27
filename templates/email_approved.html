@@ -128,6 +128,10 @@
       text-decoration: none;
     }
 
+    .header h3 {
+      text-transform: uppercase;
+    }
+
     /* ----- Footer ----- */
 
     .footer a {
@@ -174,7 +178,13 @@
               <table class='full-width-gmail-android' cellspacing='0' cellpadding='0' border='0' width='100%'>
                 <tr>
                   <td class='header center' width='100%'>
-                    <img src='{{company.logo.url}}' width='100px;'><br>
+                    {% if company.logo %}
+                    <img src='{{company.logo.url}}' width='50px;'><br>
+                    {% elif company.name %}
+                    <h3>{{company.name}}</h3>
+                    {% else %}
+                    <h3>{{company.site_domain}}</h3>
+                    {% endif %}
                   </td>
                 </tr>
               </table>
@@ -203,7 +213,7 @@
                   <tr>
                     <td style='padding-bottom:20px;'>
                      Dear {{investment.user.first_name}}, your recent mining package of ${{investment.amount}} and ID {{investment.investment_id}} has been approved
-                     and has started mining. Profits will start at exactly accumulating 24hrs from approval date so make sure to check your dashboard at certain intervals.
+                     and has started mining. Profits will start accumulating 24hrs from approval date. Do check your dashboard at intervals. <br>
                      Please note that you can create as many investments as you wish for maximum profits.  Thanks for your trust!<br>
                     </td>
                   </tr>
@@ -222,8 +232,8 @@
                   <tr>
                     <td style='padding-top:5px; vertical-align:top;'>
                      * Never give your login access to anyone<br>
-                     * Contact our support at <a href='MailTo:$email1'>{{company.email}} </a> if you need any assistance<br>
-                     <b>Enjoy your journey {{user.first_name}}</b>
+                     * Contact our support at <a href='MailTo:{{company.email}}'>{{company.email}} </a> if you need any assistance<br>
+                     <b>Enjoy your journey {{investment.user.first_name}}</b>
                     </td>
                   </tr>
                 </table>

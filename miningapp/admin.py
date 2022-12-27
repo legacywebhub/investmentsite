@@ -2,20 +2,22 @@ from django.contrib import admin
 from .models import *
 
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('name', 'balance', 'referral_balance', 'total_balance')
-    list_filter = ()
+    list_display = ('user', 'email', 'balance', 'referral_balance', 'total_balance')
+    list_display_links = ('user', 'email',)
+    list_filter = ('user',)
     list_per_page = 20
 
+    # Render filtered options only after 5 characters were entered
+    filter_input_length = {
+        'user': 5
+    }
+
     def name(self, obj):
-        if obj.user.fullname:
-            name = obj.user.fullname
-        elif obj.user.username:
-            name = obj.user.username
-        elif obj.user.first_name:
-            name = obj.user.first_name
-        else:
-            name = obj.user.email
-        return name
+        return obj.user.fullname
+
+    def email(self, obj):
+        return obj.user.email
+
 
 
 class CompanyInfoAdmin(admin.ModelAdmin):
@@ -40,7 +42,7 @@ class InvestmentAdmin(admin.ModelAdmin):
     list_display_links = ('date', 'user', 'amount',)
     list_per_page = 20
 
-    # Render filtered options only after 5 characters were entered
+    # Render filtered options only after 3 characters were entered
     filter_input_length = {
         "user": 3,
     }
@@ -124,9 +126,9 @@ class UserAdmin(admin.ModelAdmin):
 
     # Render filtered options only after 5 characters were entered
     filter_input_length = {
-        "first_name": 3,
-        "last_name": 3,
-        "email": 3
+        "first_name": 5,
+        "last_name": 5,
+        "email": 5
     }
 
 
@@ -137,7 +139,7 @@ class WithdrawAdmin(admin.ModelAdmin):
     list_filter = ('date', 'user', 'status', 'payment_method',)
     list_per_page = 20
 
-    # Render filtered options only after 5 characters were entered
+    # Render filtered options only after 3 characters were entered
     filter_input_length = {
         "user": 3,
     }

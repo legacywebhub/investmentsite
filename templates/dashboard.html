@@ -221,7 +221,7 @@
 
     // Function to generate random decimal
     function randMinMax(text, max) {
-        return text + Math.random() * max;
+        return text + (Math.random() * max).toFixed(7);
     }
 
     // Function to generate and update random decimals at a given period of time

@@ -71,9 +71,16 @@
                         <td>${{withdraw.amount}}</td>
                         <td>{{withdraw.payment_address}}</td>
                         <td>{{withdraw.network}}</td>
-                        <td>{{withdraw.status}}</td>
-                        <td><a href="javascript:void(0);" class="btn btn-icon btn-inverse-info"><i class="ti ti-eye"></i></a></td>
-                        <!-- <td><a href="javascript:void(0)" class="dot"></a><span>Paid</span></td> -->
+                        {% if withdraw.status == 'pending' %}
+                        <td class="text-warning">{{withdraw.status}}</td>
+                        <td><a href="javascript:void(0);" class="btn btn-icon btn-inverse-warning"><i class="ti ti-eye"></i></a></td>
+                        {% elif withdraw.status == 'approved' %}
+                        <td class="text-success">{{withdraw.status}}</td>
+                        <td><a href="javascript:void(0);" class="btn btn-icon btn-inverse-success"><i class="ti ti-eye"></i></a></td>
+                        {% else %}
+                        <td class="text-danger">{{withdraw.status}}</td>
+                        <td><a href="javascript:void(0);" class="btn btn-icon btn-inverse-danger"><i class="ti ti-eye"></i></a></td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>

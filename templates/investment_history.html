@@ -77,8 +77,16 @@
                         <td>${{investment.daily_profit}}</td>
                         <td>${{investment.total_profit}}</td>
                         <td>${{investment.returns}}</td>
-                        <td>{{investment.status}}</td>
+                        {% if investment.status == 'pending' %}
+                        <td class="text-warning">{{investment.status}}</td>
+                        <td><a href="{% url 'mining:investment_detail' investment.investment_id %}" class="btn btn-icon btn-inverse-warning"><i class="ti ti-eye"></i></a></td>
+                        {% elif investment.status == 'approved' %}
+                        <td class="text-info">{{investment.status}}</td>
                         <td><a href="{% url 'mining:investment_detail' investment.investment_id %}" class="btn btn-icon btn-inverse-info"><i class="ti ti-eye"></i></a></td>
+                        {% elif investment.status == 'completed' %}
+                        <td class="text-success">{{investment.status}}</td>
+                        <td><a href="{% url 'mining:investment_detail' investment.investment_id %}" class="btn btn-icon btn-inverse-success"><i class="ti ti-eye"></i></a></td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>

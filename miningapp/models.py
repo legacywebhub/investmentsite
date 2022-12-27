@@ -323,7 +323,7 @@ class Investment(models.Model):
                 # Sending approval mail
                 try:
                     company = CompanyInfo.objects.last()
-                    html_content = render_to_string('email_approved.html', {'user':self.user, 'company':company})
+                    html_content = render_to_string('email_approved.html', {'investment':Investment.objects.get(id=self.id), 'company':company})
                     email = EmailMessage(f'Dear {self.user.first_name}, your mining package of ${self.amount} and ID {self.investment_id} has been approved', html_content, company.email, [self.user.email,])
                     email.content_subtype = 'html'
                     email.fail_silently = False
@@ -409,43 +409,6 @@ class Investment(models.Model):
         elif self.payment_method == 'DASHCOIN':
             address = company.dashcoin_address
         return address
-
-    # Payment QR-code to be used for investment
-    @property
-    def payment_qrcode(self):
-        company = CompanyInfo.objects.last()
-
-        if self.payment_method == 'BITCOIN':
-            qrcode = company.bitcoin_qrcode
-        elif self.payment_method == 'ETHEREUM':
-            qrcode = company.ethereum_qrcode
-        elif self.payment_method == 'BINANCE':
-            qrcode = company.binance_qrcode
-        elif self.payment_method == 'USDT-TRC20':
-            qrcode = company.usdt_trc20_qrcode
-        elif self.payment_method == 'USDT-ERC20':
-            qrcode = company.usdt_erc20_qrcode
-        elif self.payment_method == 'USDT-BEP20':
-            qrcode = company.usdt_bep20_qrcode
-        elif self.payment_method == 'BUSD':
-            qrcode = company.busd_qrcode
-        elif self.payment_method == 'TRON':
-            qrcode = company.tron_qrcode
-        elif self.payment_method == 'LITECOIN':
-            qrcode = company.litecoin_qrcode
-        elif self.payment_method == 'BITCOIN CASH':
-            qrcode = company.bitcoincash_qrcode
-        elif self.payment_method == 'DOGECOIN':
-            qrcode = company.dogecoin_qrcode
-        elif self.payment_method == 'XRP':
-            qrcode = company.xrp_qrcode
-        elif self.payment_method == 'SOLANA':
-            qrcode = company.solana_qrcode
-        elif self.payment_method == 'CARDANO':
-            qrcode = company.cordano_qrcode
-        elif self.payment_method == 'DASHCOIN':
-            qrcode = company.dashcoin_qrcode
-        return qrcode
 
 
 

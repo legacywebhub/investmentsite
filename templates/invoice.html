@@ -91,7 +91,7 @@
                 <div>
                     <center>
                         {% if investment.status == 'pending' %}
-                        <img src="{{investment.payment_qrcode.url}}" width="150">
+                        <img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl={{investment.payment_address}}&choe=UTF-8" width="200">
                         <p>Wallet Address (<b class="u">{{investment.payment_method}}</b>)</p>
                         <div class='input-group'>
                             <input id='address' class='form-control bl-0' value="{{investment.payment_address}}" readonly>
@@ -200,7 +200,13 @@
                     {% endif %}
                     <li class="invoice-item"><span class="invoice-item-title">PAYMENT METHOD</span> <span class="invoice-result">{{investment.payment_method}}</span></li>
                     <li class="invoice-item"><span class="invoice-item-title">DURATION</span> <span class="invoice-result">{{investment.package.duration_in_days}} DAYS</span></li>
-                    <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b>{{investment.get_status_display}}</b></span></li>
+                    {% if investment.status == 'pending' %}
+                    <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b class="text-warning">{{investment.get_status_display}}</b></span></li>
+                    {% elif investment.status == 'approved' %}
+                    <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b class="text-info">{{investment.get_status_display}}</b></span></li>
+                    {% elif investment.status == 'completed' %}
+                    <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b class="text-success">{{investment.get_status_display}}</b></span></li>
+                    {% endif %}
                 </div>
             </div>
         </div>
