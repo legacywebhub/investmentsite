@@ -13,7 +13,8 @@ such as celery, redis, crontab, django-scheduler etc
 * A single function handles account credit and debit, saves the transaction record and sends appropriate notification 
 * Users can get their investment details in PDF format
 * Gets users location and timezone on sign up and profile settings
-* crypto qr code are generated from address
+* Cryptocurrencies qr code are generated from address
+* Email uses html templates for formatting
 * Ajax and animations
 
 
@@ -66,4 +67,4 @@ PyMySQL==1.0.2
 # Notes
 * To run on cpanel host, some packages are not compatible so older versions of libraries are used
 * Pillow, pscopg2, reportlab and mysqlclient(for mySQLdb) had conflicts
-* mysqlclient requires an extra setting with PyMySQL on settings.py
+* mysqlclient requires an extra setting with PyMySQL library on settings.py

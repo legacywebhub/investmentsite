@@ -48,7 +48,7 @@ def register(request):
                 if User.objects.filter(email=email).exists():
                     messages.error(request, 'Sorry this email has already been taken!')
                 else:
-                    if len(password2) >= 7:
+                    if len(password2) >= 5:
                         # Saving user and user instances
                         user = User.objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password2)
                         user.save()
@@ -102,7 +102,7 @@ def uplineRegister(request, refcode):
                 if User.objects.filter(email=email).exists():
                     messages.error(request, 'Sorry this email has already been taken!')
                 else:
-                    if len(password2) >= 7:
+                    if len(password2) >= 5:
                         # Saving user and user instances
                         user = User.objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password2)
                         user.save()
@@ -190,13 +190,14 @@ def contact(request):
                 messages.info(request, 'Your email is not valid')
             else:
                 try:
-                    # Trying to notify company or admins via mail
-                    send_mail(
-                    f'{subject} ({location})', message, email, [company.email,], fail_silently=False
-                    )
+                    html_content = render_to_string('email_template.html', {'subject':subject, 'message':message})
+                    email = EmailMessage(subject, html_content, email, [company.email, settings.EMAIL_HOST_USER])
+                    email.content_subtype = 'html'
+                    email.fail_silently = False
+                    email.send()
                     print(f'Message was successfully sent to admins...')
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
                 message = Message.objects.create(name=name, location=location, email=email, subject=subject, message=message)
                 message.save()
                 messages.success(request, 'Your message was sent successfully')
@@ -615,21 +616,21 @@ def investFromBalance(request):
 # view to alert admins of payment
 def confirmPayment(request):
     data = json.loads(request.body)
-    print(data)
-    id = int(data['id'])
-    investment = Investment.objects.get(investment_id=id)
+    company = CompanyInfo.objects.last()
+    investment = Investment.objects.get(investment_id=int(data['id']))
     subject = f'PAYMENT CONFIRMATION FOR INVESTMENT {investment.investment_id}'
     message = f'*Investment ID - {investment.investment_id}\n*Payment Method - {investment.payment_method}\n*Amount - {investment.amount}\n*Date/Time - {investment.date}'
-    print(message)
 
+    # Trying to notify company or admins via mail
     try:
-        # Trying to notify company or admins via mail
-        send_mail(
-            subject, message, request.user.email, [settings.EMAIL_HOST_USER,], fail_silently=False
-        )
+        html_content = render_to_string('email_template.html', {'subject':subject, 'message':message})
+        email = EmailMessage(subject, html_content, request.user.email, [company.email, settings.EMAIL_HOST_USER])
+        email.content_subtype = 'html'
+        email.fail_silently = False
+        email.send()
         print(f'Message was successfully sent to admins...')
-    except:
-        pass
+    except Exception as e:
+        print(e)
     message = Message.objects.create(name=request.user.fullname, email=request.user.email, subject=subject, message=message)
     message.save()
     return JsonResponse("Your payment would be confirmed and updated... check back later", safe=False)
