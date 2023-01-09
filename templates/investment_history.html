@@ -95,7 +95,7 @@
             {% if investments %}
             <div class="pagination-container">
                 <div class="pagination-display">
-                    <div class="dataTables_info" id="datatable_info" role="status" aria-live="polite">Page {{ investments.number }} of {{ investments.paginator.num_pages }}</div>
+                    <div class="dataTables_info" id="datatable_info" role="status" aria-live="polite">Page <b>{{ investments.number }}</b> of <b>{{ investments.paginator.num_pages }}</b></div>
                 </div>
                 <div class="pagination-control">
                     <div class="dataTables_paginate paging_simple_numbers" id="datatable_paginate">
@@ -105,7 +105,11 @@
                             {% else %}
                             <li class="paginate_button page-item previous" id="datatable_previous"><a href="javascript:void(0)" aria-controls="datatable" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
                             {% endif %}
-                            <li class="paginate_button page-item active"><a href="javascript:void(0)" aria-controls="datatable" data-dt-idx="1" tabindex="0" class="page-link">{{ investments.number }}</a></li>
+
+                            {% for investment in page_list %}
+                            <li {% if investments.number == investment %}class="paginate_button page-item active"{% else %}class="paginate_button page-item"{% endif %}><a href="?page={{ investment }}" aria-controls="datatable" data-dt-idx="1" tabindex="0" class="page-link">{{ investment }}</a></li>
+                            {% endfor %}
+
                             {% if investments.has_next %}
                             <li class="paginate_button page-item next" id="datatable_next"><a href="?page={{ investments.next_page_number }}" aria-controls="datatable" data-dt-idx="7" tabindex="0" class="page-link">Next</a></li>
                             {% else %}

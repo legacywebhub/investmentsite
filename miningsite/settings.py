@@ -13,11 +13,11 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 from decouple import config
-import pymysql
+#import pymysql
     
 
 # Extra setting for mysqlclient library for mySQLdb on cpanel hosting
-pymysql.install_as_MySQLdb()
+#pymysql.install_as_MySQLdb()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -33,7 +33,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'bitinvest.up.railway.app'] #config('ALLOWED_HOSTS', cast=list)
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'miningsite.up.railway.app'] #config('ALLOWED_HOSTS', cast=list)
 
 
 # Application definition

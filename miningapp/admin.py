@@ -59,6 +59,28 @@ class InvestmentAdmin(admin.ModelAdmin):
         return name
 
 
+class LastDepositAdmin(admin.ModelAdmin):
+    list_display = ('date', 'name', 'amount', 'currency',)
+    list_display_links = ('date', 'name',)
+    list_filter = ('name',)
+
+    # Render filtered options only after 3 characters were entered
+    filter_input_length = {
+        "name": 3,
+    }
+
+
+class LastWithdrawAdmin(admin.ModelAdmin):
+    list_display = ('date', 'name', 'amount', 'currency',)
+    list_display_links = ('date', 'name',)
+    list_filter = ('name',)
+
+    # Render filtered options only after 3 characters were entered
+    filter_input_length = {
+        "name": 3,
+    }
+
+
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('date_received', 'subject', 'name', 'email')
     list_filter = ('date_received',)
@@ -150,6 +172,8 @@ admin.site.register(Account, AccountAdmin)
 admin.site.register(CompanyInfo, CompanyInfoAdmin)
 admin.site.register(Deposit, DepositAdmin)
 admin.site.register(Investment, InvestmentAdmin)
+admin.site.register(LastDeposit, LastDepositAdmin)
+admin.site.register(LastWithdraw, LastWithdrawAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Package, PackageAdmin)

@@ -53,7 +53,7 @@
                             <div class="col-sm-6 col-lg-5 col-xxl-3  align-self-center order-2 order-sm-1">
                                 <div class="d-flex align-items-center h-100-vh">
                                     <div class="login p-50">
-                                        <h1 class="mb-2">We Are Mentor</h1>
+                                        <h1 class="mb-2">We Are {{company.name}}</h1>
                                         <h5>Welcome back, please login to your account.</h5>
                                         {% for message in messages %}
                                         <p {% if message.tags %}class="{{message.tags}}"{% endif %}>{{message}}</p>

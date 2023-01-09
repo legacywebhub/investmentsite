@@ -28,8 +28,11 @@ from reportlab.lib.pagesizes import letter
 
 def index(request):
     company = CompanyInfo.objects.last()
-    packages = Package.objects.all
-    return render(request, 'index.html', {'company':company, 'packages':packages})
+    packages = Package.objects.all()
+    last_deposits = LastDeposit.objects.all().order_by('-date')[:10]
+    last_withdraws = LastWithdraw.objects.all().order_by('-date')[:10]
+    contexts = {'company':company, 'packages':packages, 'last_deposits': last_deposits, 'last_withdraws': last_withdraws}
+    return render(request, 'index.html', contexts)
 
 
 
@@ -75,7 +78,7 @@ def register(request):
                         messages.success(request, f'{user.first_name}, your account has successfully been created... you can now sign in!')
                         return redirect('mining:login')
                     else:
-                        messages.error(request, 'Password length cannot be less than 7... Please try again')
+                        messages.error(request, 'Password length cannot be less than 5')
             else:
                 messages.error(request, 'Passwords does not match... Please try again')
     return render(request, 'register.html', {'company':company})
@@ -133,7 +136,7 @@ def uplineRegister(request, refcode):
                         messages.success(request, f'{user.first_name}, your account has successfully been created... you can now sign in!')
                         return redirect('mining:login')
                     else:
-                        messages.error(request, 'Password length cannot be less than 7... Please try again')
+                        messages.error(request, 'Password length cannot be less than 5... Please try again')
             else:
                 messages.error(request, 'Passwords does not match... Please try again')
     return render(request, 'register.html', {'company': company,'upline':upline})
@@ -176,6 +179,31 @@ def faq(request):
 
 
 
+def team(request):
+    company = CompanyInfo.objects.last()
+    return render(request, 'team.html', {'company':company})
+
+
+
+def reviews(request):
+    company = CompanyInfo.objects.last()
+    return render(request, 'reviews.html', {'company':company})
+
+
+
+def plans(request):
+    company = CompanyInfo.objects.last()
+    packages = Package.objects.all()
+    return render(request, 'plans.html', {'company':company, 'packages': packages})
+
+
+
+def tac(request):
+    company = CompanyInfo.objects.last()
+    return render(request, 'tac.html', {'company':company})
+
+
+
 def contact(request):
     company = CompanyInfo.objects.last()
     if request.method == 'POST':
@@ -203,7 +231,7 @@ def contact(request):
                 message = Message.objects.create(name=name, location=location, email=email, subject=subject, message=message)
                 message.save()
                 messages.success(request, 'Your message was sent successfully')
-    return render(request, 'contact.html')
+    return render(request, 'contact.html', {'company': company})
 
 
 
@@ -328,12 +356,14 @@ def investHistory(request):
     p = Paginator(user_investments, 10)
     page = request.GET.get('page')
     investments = p.get_page(page)
+    page_list = range(1, investments.paginator.num_pages + 1)
     context = {
         'company':company, 
         'notifications':notifications,
         'total_notifications': total_notifications,
         'recent_notifications': recent_notifications,
-        'investments':investments
+        'investments':investments,
+        'page_list': page_list
     }
     return render(request, 'investment_history.html', context)
 
@@ -371,12 +401,14 @@ def withdrawalHistory(request):
     p = Paginator(user_withdrawals, 10)
     page = request.GET.get('page')
     withdrawals = p.get_page(page)
+    page_list = range(1, withdrawals.paginator.num_pages + 1)
     context = {
         'company': company,
         'notifications': notifications, 
         'total_notifications': total_notifications,
         'recent_notifications': recent_notifications,
-        'withdrawals':withdrawals
+        'withdrawals':withdrawals,
+        'page_list': page_list
     }
     return render(request, 'withdrawal_history.html', context)
 

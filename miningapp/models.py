@@ -6,7 +6,27 @@ from .utils import generateRefCode, updateAccount
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from decimal import Decimal
+# RawMediaCloudinaryStorage for cloudinary document export
 from cloudinary_storage.storage import RawMediaCloudinaryStorage
+
+
+
+currencies = (
+    ('USD', 'USD'),
+    ('Bitcoin', 'Bitcoin'),
+    ('Ethereum', 'Ethereum'),
+    ('Binance', 'Binance'),
+    ('Ripple', 'Ripple'),
+    ('Dogecoin', 'Dogecoin'),
+    ('Litecoin', 'Litecoin'),
+    ('Bitcoin cash', 'Bitcoin cash'),
+    ('Dash', 'Dash'),
+    ('USDT', 'USDT'),
+    ('BUSD', 'BUSD'),
+    ('Tron', 'Tron'),
+    ('Solana', 'Solana'),
+    ('Cardano', 'Cardano')
+)
 
 
 # Create your models here.
@@ -223,8 +243,16 @@ class CompanyInfo(models.Model):
     address = models.CharField(max_length=150, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=25, blank=True, null=True)
+    whatsapp_link  = models.URLField(max_length=200, blank=True, null=True)
+    facebook_link  = models.URLField(max_length=200, blank=True, null=True)
+    instagram_link  = models.URLField(max_length=200, blank=True, null=True)
+    twitter_link  = models.URLField(max_length=200, blank=True, null=True)
+    linked_in = models.URLField(max_length=200, blank=True, null=True)
+    youtube_link = models.URLField(max_length=200, blank=True, null=True)
     certificate = models.ImageField(upload_to="images/company", blank=True, null=True)
     document = models.FileField(upload_to='document', blank=True, null=True, storage=RawMediaCloudinaryStorage())
+    video = models.URLField(max_length=2000, blank=True, null=True)
+    youtube_video = models.CharField(max_length=500, blank=True, null=True, help_text='Youtube embedded video code')
     bitcoin_address = models.CharField(max_length=200, blank=True, null=True)
     ethereum_address = models.CharField(max_length=200, blank=True, null=True)
     litecoin_address = models.CharField(max_length=200, blank=True, null=True)
@@ -247,6 +275,42 @@ class CompanyInfo(models.Model):
     def save(self, *args, **kwargs):
         if not self.id and CompanyInfo.objects.exists():
             raise ValueError("This model cannot have two or more records")
+        else:
+            super().save(*args, **kwargs)
+
+
+
+class LastDeposit(models.Model):
+    date = models.DateField(blank=False)
+    name = models.CharField(max_length=150, blank=False)
+    amount = models.PositiveSmallIntegerField(blank=False)
+    currency = models.CharField(max_length=50, choices=currencies, blank=False)
+
+    def __str__(self):
+        return f'{str(self.date)} {self.name} {str(self.amount)} {self.currency}'
+
+    
+    def save(self, *args, **kwargs):
+        if len(LastDeposit.objects.all()) > 30:
+            raise ValueError("This model cannot have more than 30 records")
+        else:
+            super().save(*args, **kwargs)
+
+
+
+class LastWithdraw(models.Model):
+    date = models.DateField(blank=False)
+    name = models.CharField(max_length=150, blank=False)
+    amount = models.PositiveSmallIntegerField(blank=False)
+    currency = models.CharField(max_length=50, choices=currencies, blank=False)
+
+    def __str__(self):
+        return f'{str(self.date)} {self.name} {str(self.amount)} {self.currency}'
+
+    
+    def save(self, *args, **kwargs):
+        if len(LastDeposit.objects.all()) > 30:
+            raise ValueError("This model cannot have more than 30 records")
         else:
             super().save(*args, **kwargs)
 
