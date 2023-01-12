@@ -20,7 +20,7 @@
 
 {% block pagetitle %}
 <div class="row">
-    <div class="col-md-12 m-b-30">
+    <div class="col-lg-12 m-b-30">
         <!-- begin page title -->
         <div class="d-block d-lg-flex flex-nowrap align-items-center">
             <div class="page-title mr-4 pr-4 border-right">
@@ -45,7 +45,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="col-12">
+<div style="min-height: 60vh;">
     <div class="card card-statistics clients-contant">
         <div class="card-header">
             <h3><center>WITHDRAWAL HISTORY</center></h3>
@@ -72,8 +72,8 @@
                         <td>{{withdraw.payment_address}}</td>
                         <td>{{withdraw.network}}</td>
                         {% if withdraw.status == 'pending' %}
-                        <td class="text-warning">{{withdraw.status}}</td>
-                        <td><a href="javascript:void(0);" class="btn btn-icon btn-inverse-warning"><i class="ti ti-eye"></i></a></td>
+                        <td class="text-secondary">{{withdraw.status}}</td>
+                        <td><a href="javascript:void(0);" class="btn btn-icon btn-inverse-secondary"><i class="ti ti-eye"></i></a></td>
                         {% elif withdraw.status == 'approved' %}
                         <td class="text-success">{{withdraw.status}}</td>
                         <td><a href="javascript:void(0);" class="btn btn-icon btn-inverse-success"><i class="ti ti-eye"></i></a></td>
@@ -88,7 +88,7 @@
 
             {% if withdrawals %}
             <div class="pagination-container">
-                <div class="pagination-display">
+                <div class="pagination-display mb-2">
                     <div class="dataTables_info" id="datatable_info" role="status" aria-live="polite">Page <b>{{ withdrawals.number }}</b> of <b>{{ withdrawals.paginator.num_pages }}</b></div>
                 </div>
                 <div class="pagination-control">

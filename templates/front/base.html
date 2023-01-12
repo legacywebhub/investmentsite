@@ -1,0 +1,482 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- SEO Meta description -->
+    <meta name="description"
+          content="{{company.name}} is an assured trading trading contract or agency and marketing helps you easily earn more profits to your business.">
+    <meta name="author" content="ThemeTags">
+
+    <!-- OG Meta Tags to improve the way the post looks when you share the page on LinkedIn, Facebook, Google+ -->
+    <meta property="og:site_name" content=""/> <!-- website name -->
+    <meta property="og:site" content=""/> <!-- website link -->
+    <meta property="og:title" content=""/> <!-- title shown in the actual shared post -->
+    <meta property="og:description" content=""/> <!-- description shown in the actual shared post -->
+    <meta property="og:image" content=""/> <!-- image link, make sure it's jpg -->
+    <meta property="og:url" content=""/> <!-- where do you want your post to link to -->
+    <meta property="og:type" content="article"/>
+   <meta name="theme-color" content="#007cc5">
+    <!--title-->
+    {% block title %}
+    {% endblock %}
+
+    <!--favicon icon-->
+    <link rel="icon" href="{% static 'base/img/favicon.png' %}" type="image/png" sizes="16x16">
+
+    <!--google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700%7COpen+Sans:400,600&amp;display=swap" rel="stylesheet">
+
+    <!--Bootstrap css-->
+    <link rel="stylesheet" href="{% static 'base/css/bootstrap.min.css' %}">
+    <!--Magnific popup css-->
+    <link rel="stylesheet" href="{% static 'base/css/magnific-popup.css' %}">
+    <!--Themify icon css-->
+    <link rel="stylesheet" href="{% static 'base/css/themify-icons.css' %}">
+    <!--Fontawesome icon css-->
+    <link rel="stylesheet" href="{% static 'base/css/all.min.css' %}">
+    <!--animated css-->
+    <link rel="stylesheet" href="{% static 'base/css/animate.min.css' %}">
+    <!--ytplayer css-->
+    <link rel="stylesheet" href="{% static 'base/css/jquery.mb.YTPlayer.min.css' %}">
+    <!--Owl carousel css-->
+    <link rel="stylesheet" href="{% static 'base/css/owl.carousel.min.css' %}">
+    <link rel="stylesheet" href="{% static 'base/css/owl.theme.default.min.css' %}">
+    <!--custom css-->
+    <link rel="stylesheet" href="{% static 'base/css/style.css' %}">
+    <!--responsive css-->
+    <link rel="stylesheet" href="{% static 'base/css/responsive.css' %}">
+    
+    <link rel="stylesheet" href="{% static 'base/cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css' %}">
+    <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
+    <link rel="stylesheet" href="{% static 'base/css/customstyle.css' %}">
+    <style>
+        .info {
+            color: rgba(2, 2, 211, 0.753);
+        }
+        .success {
+            color: rgba(5, 187, 5, 0.801);
+        }
+        .error {
+            color: rgba(255, 0, 0, 0.801);
+        }
+    </style>
+    {% block style %}
+    {% endblock %}
+    <script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    </script>
+</head>
+
+<body onunload="">
+<div id="preloader">
+    <div class="loader1">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+<header class="header">
+    <!--start navbar-->
+    <nav class="navbar navbar-expand-lg fixed-top bg-transparent">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{% static 'base/img/logo.png' %}" style="height: 30px;" alt="logo" class="img-fluid" width="300"/>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="ti-menu"></span>
+            </button>
+            <div class="collapse navbar-collapse h-auto" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto menu">
+                    
+                    <li><a  href="/">Home</a></li>
+                    <li><a  href="{% url 'mining:about' %}">About Us</a></li>
+                    <li><a href="#" class="dropdown-toggle"> Services</a>
+                        <ul class="sub-menu">
+                           <li><a href="{% url 'mining:services' %}">Forex</a></li>
+                            <li><a href="{% url 'mining:services' %}">Agriculture</a></li>
+                            <li><a href="{% url 'mining:services' %}">Oil and Gas</a></li>
+                            <li><a href="{% url 'mining:services' %}">Real Estate</a></li>
+                            <li><a href="{% url 'mining:services' %}">Retirement and Insurance Services</a></li>
+                            <li><a href="{% url 'mining:services' %}">Gold</a></li>
+                        </ul>
+                    </li>
+                    
+                    <li><a href="{% url 'mining:plans' %}">Investment Plans</a></li>
+                    <li><a href="{% url 'mining:faq' %}">FAQs</a></li>
+                    <li><a href="{% url 'mining:contact' %}">Get Support</a></li>
+                    <li><a style="opacity: 1;" href="{% url 'mining:register' %}" class="btn btn-sm btn-success p-2 mb-2">Create New Account</a></li>
+                    <li><a style="opacity: 1;" href="{% url 'mining:login' %}" class="btn outline-white-btn p-2">Go to your Account</a></li>
+                                                
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+
+<div class="main">
+{% block content %}
+{% endblock %}
+</div>
+
+
+<div class="client-section gray-light-bg" style="padding: 10px 0px;">
+    <div class="container">
+        <!--clients logo start-->
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="owl-carousel owl-theme clients-carousel dot-indicator">
+                    <div class="item single-client">
+                        <img src="{% static 'base/img/clients-logo-01.png' %}" alt="client logo" class="client-img">
+                    </div>
+                    <div class="item single-client">
+                        <img src="{% static 'base/img/clients-logo-02.png' %}" alt="client logo" class="client-img">
+                    </div>
+                    <div class="item single-client">
+                        <img src="{% static 'base/img/clients-logo-03.png' %}" alt="client logo" class="client-img">
+                    </div>
+                    <div class="item single-client">
+                        <img src="{% static 'base/img/clients-logo-04.png' %}" alt="client logo" class="client-img">
+                    </div>
+                    <div class="item single-client">
+                        <img src="{% static 'base/img/clients-logo-05.png' %}" alt="client logo" class="client-img">
+                    </div>
+                    <div class="item single-client">
+                        <img src="{% static 'base/img/clients-logo-06.png' %}" alt="client logo" class="client-img">
+                    </div>
+                    <div class="item single-client">
+                        <img src="{% static 'base/img/clients-logo-07.png' %}" alt="client logo" class="client-img">
+                    </div>
+                    <div class="item single-client">
+                        <img src="{% static 'base/img/clients-logo-08.png' %}" alt="client logo" class="client-img">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--clients logo end-->
+    </div>
+</div>
+
+<footer class="footer-section">
+    <!--footer top start-->
+    <div class="footer-top gradient-bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="row footer-top-wrap">
+                        <div class="col-md-3 col-sm-6">
+                            <div class="footer-nav-wrap text-white">
+                                <h4 class="text-white">QUICK LINKS</h4>
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'mining:register' %}">Sign Up</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'mining:login' %}">Login</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'mining:plans' %}">Investment Plans</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">Where to Buy Bitcoin</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="footer-nav-wrap text-white">
+                                <h4 class="text-white">COMPANY</h4>
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/">Home</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'mining:about' %}">About Us</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'mining:about' %}">Our Services</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'mining:faq' %}">FAQs</a>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="footer-nav-wrap text-white">
+                                <h4 class="text-white">LEGAL</h4>
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="javascript:void(0);">Legal Information</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="javascript:void(0);">Privacy Policy</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'mining:contact' %}">Report Abuse</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="javascript:void(0);">Terms of Service</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="footer-nav-wrap text-white">
+                                <h4 class="text-white">SUPPORT</h4>
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'mining:contact' %}">Contact</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="javascript:void(0);">Knowledge Base</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'mining:faq' %}">FAQs</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="javascript:void(0);">System Status</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="row footer-top-wrap">
+                        <div class="col-12">
+                            <div class="footer-nav-wrap text-white">
+                                <h4 class="text-white">GET IN TOUCH</h4>
+                                <ul class="get-in-touch-list">
+                                    <li class="d-flex align-items-center py-2"><span class="fas fa-map-marker-alt mr-2"></span> {{company.address}}</li>
+                                    <li class="d-flex align-items-center py-2"><span class="fas fa-envelope mr-2"></span> {{company.email}}</li>
+                                   <li class="d-flex align-items-center py-2"><i class="fas fa-phone"></i>&nbsp;&nbsp;{{company.phone}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--footer top end-->
+
+    <!--footer copyright start-->
+    <div class="footer-bottom gray-light-bg py-2 mb-5">
+        <div class="container">
+            <div class="row align-items-center justify-content-between">
+                <div class="col-md-5 col-lg-5">
+                    <p class="copyright-text pb-0 mb-0">Copyrights © 2021. All
+                        rights reserved
+                        <a href="/" target="_blank">{{company.site_domain}}</a></p>
+                </div>
+                <div class="col-md-7 col-lg-6 d-none d-md-block d-lg-block">
+                    <div class="social-nav text-right">
+                        <ul class="list-unstyled social-list mb-0">
+                            <li class="list-inline-item tooltip-hover">
+                                <a href="http://facebook.com/" target="_blank" class="rounded"><span class="ti-facebook"></span></a>
+                                <div class="tooltip-item">Facebook</div>
+                            </li>
+                            <li class="list-inline-item tooltip-hover"><a href="http://twitter.com/" target="_blank" class="rounded"><span class="ti-twitter"></span></a>
+                                <div class="tooltip-item">Twitter</div>
+                            </li>
+                            <li class="list-inline-item tooltip-hover"><a href="http://linkedin.com/" target="_blank" class="rounded"><span class="ti-linkedin"></span></a>
+                                <div class="tooltip-item">Linkedin</div>
+                            </li>
+                            <li class="list-inline-item tooltip-hover"><a href="http://instagram.com/" target="_blank" class="rounded"><span class="ti-instagram"></span></a>
+                                <div class="tooltip-item">Instagram</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--footer copyright end-->
+</footer>
+<!--footer section end-->
+
+<!--bottom to top button start-->
+<button class="scroll-top scroll-to-target" data-target="html">
+    <span class="ti-angle-up"></span>
+</button>
+<!--bottom to top button end-->
+<div style="position: fixed; left: 0; bottom: 0; z-index: 1; width: 100%;">
+    <div style="width: 100%; background-color: #FFFFFF; overflow:hidden; box-sizing: border-box; text-align: right; line-height:14px; font-size: 12px; box-sizing:content-box; font-feature-settings: normal; text-size-adjust: 100%; padding:1px;padding: 0px; margin: 0px;">
+        <div style="height:40px;">
+            <iframe src="https://widget.coinlib.io/widget?type=horizontal_v2&amp;theme=light&amp;pref_coin_id=1505&amp;invert_hover=" width="100%" height="36" scrolling="auto" marginwidth="0" marginheight="0" frameborder="0" border="0" style="border:0;margin:0;padding:0;">
+                </iframe>
+        </div>
+    </div>
+</div>
+
+<div class="telegram-popup" align="center">
+
+    <!--Telegram icon. I like to use font-awesome but dont want to effect your imports too much.-->
+    <a href="https://tawk.to/chat/625b6dbab0d10b6f3e6debbd/1g0qi98fk"  class="telegram-button-link" target="_blank">
+        <div style="margin-left:-80px;padding-bottom:20px" class="whatsapp-button">
+    
+        <img style="width:18px;height:18px;margin-top:-8px" src="https://cdn4.iconfinder.com/data/icons/bussines-people/289/man-contact-512.png">
+        <span style="color:#fff;margin-top:0px"><b>LIVE  SUPPORT</b></span></a>
+    
+        </div>
+    </a>
+    
+</div>
+<script src="{% static 'base/code.tidio.co_443/qk7jh42vtpahrubwe890yj39g5ijzoxs.js' %}" async></script>
+
+
+<!--jQuery-->
+<script src="{% static 'base/js/jquery-3.4.1.min.js' %}"></script>
+<!--Popper js-->
+<script src="{% static 'base/js/popper.min.js' %}"></script>
+<!--Bootstrap js-->
+<script src="{% static 'base/js/bootstrap.min.js' %}"></script>
+<!--Magnific popup js-->
+<script src="{% static 'base/js/jquery.magnific-popup.min.js' %}"></script>
+<!--jquery easing js-->
+<script src="{% static 'base/js/jquery.easing.min.js' %}"></script>
+<!--jquery ytplayer js-->
+<script src="{% static 'base/js/jquery.mb.YTPlayer.min.js' %}"></script>
+<!--Isotope filter js-->
+<script src="{% static 'base/js/mixitup.min.js' %}"></script>
+<!--wow js-->
+<script src="{% static 'base/js/wow.min.js' %}"></script>
+<!--owl carousel js-->
+<script src="{% static 'base/js/owl.carousel.min.js' %}"></script>
+<!--countdown js-->
+<script src="{% static 'base/js/jquery.countdown.min.js' %}"></script>
+<!--custom js-->
+<script src="{% static 'base/js/all.min.js' %}"></script>
+<!--custom js-->
+<script src="{% static 'base/js/scripts.js' %}"></script>
+<!-- inpage script -->
+<script>
+function showTime(){
+    var date = new Date();
+    var h = date.getHours(); // 0 - 23
+    var m = date.getMinutes(); // 0 - 59
+    var s = date.getSeconds(); // 0 - 59
+    var session = "AM";
+    
+    if(h === 0){
+        h = 12;
+    }
+    
+    if(h > 12){
+        h = h - 12;
+        session = "PM";
+    }
+    
+    h = (h < 10) ? "0" + h : h;
+    m = (m < 10) ? "0" + m : m;
+    s = (s < 10) ? "0" + s : s;
+    
+    var time = h + ":" + m + ":" + s + " " + session;
+    document.getElementById("MyClockDisplay").innerText = time;
+    document.getElementById("MyClockDisplay").textContent = time;
+    
+    setTimeout(showTime, 1000);
+    
+}
+
+showTime();
+</script>
+
+<script>
+// WORK IN PROGRESS BELOW
+      	
+$('document').ready(function () {
+
+	// RESTYLE THE DROPDOWN MENU
+    $('#google_translate_element').on("click", function () {
+
+        // Change font family and color
+        $("iframe").contents().find(".goog-te-menu2-item div, .goog-te-menu2-item:link div, .goog-te-menu2-item:visited div, .goog-te-menu2-item:active div, .goog-te-menu2 *")
+            .css({
+                'color': '#544F4B',
+                'font-family': 'Roboto',
+								'width':'100%'
+            });
+        // Change menu's padding
+        $("iframe").contents().find('.goog-te-menu2-item-selected').css ('display', 'none');
+			
+				// Change menu's padding
+        $("iframe").contents().find('.goog-te-menu2').css ('padding', '0px');
+      
+        // Change the padding of the languages
+        $("iframe").contents().find('.goog-te-menu2-item div').css('padding', '20px');
+      
+        // Change the width of the languages
+        $("iframe").contents().find('.goog-te-menu2-item').css('width', '100%');
+        $("iframe").contents().find('td').css('width', '100%');
+      
+        // Change hover effects
+        $("iframe").contents().find(".goog-te-menu2-item div").hover(function () {
+            $(this).css('background-color', '#4385F5').find('span.text').css('color', 'white');
+        }, function () {
+            $(this).css('background-color', 'white').find('span.text').css('color', '#544F4B');
+        });
+
+        // Change Google's default blue border
+        $("iframe").contents().find('.goog-te-menu2').css('border', 'none');
+
+        // Change the iframe's box shadow
+        $(".goog-te-menu-frame").css('box-shadow', '0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.3)');
+        
+      
+      
+        // Change the iframe's size and position?
+        $(".goog-te-menu-frame").css({
+            'height': '100%',
+            'width': '100%',
+            'top': '0px'
+        });
+        // Change iframes's size
+        $("iframe").contents().find('.goog-te-menu2').css({
+            'height': '100%',
+            'overflow': 'scroll',
+            'width': '100%'
+        });
+    });
+});
+</script>
+<script> 
+    $(document).ready(function(){
+        $(".telegram-popup").delay(3000).show(0);
+    });
+</script>
+<script>
+    if (window.history.replaceState){
+    window.history.replaceState(null, null, window.location.href);
+    }
+    // ensure to add onunload='' to the body tag and autocomplete="off" on form tags
+</script>
+{% block script %}
+{% endblock %}
+</body>
+</html>

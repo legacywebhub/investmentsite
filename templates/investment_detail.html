@@ -150,10 +150,10 @@
                         </div>
                     </div>
                     <div>
-                        <button class='btn btn-primary' id="confirm-button">Payment status</button>
+                        <button class='btn btn-info' id="confirm-button">Payment status</button>
                     </div>
                 </div>
-                <p><button class="btn btn-primary" id="pay-button">Pay from balance</button></p><br>
+                <p><button class="btn btn-info" id="pay-button">Pay from balance</button></p><br>
                 <p id="message"></p>
             </div>
         </div>
@@ -196,14 +196,14 @@
                     <li class="invoice-item"><span class="invoice-item-title">PAYMENT METHOD</span> <span class="invoice-result">{{investment.payment_method}}</span></li>
                     <li class="invoice-item"><span class="invoice-item-title">DURATION</span> <span class="invoice-result">{{investment.package.duration_in_days}} DAYS</span></li>
                     {% if investment.status == 'pending' %}
-                    <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b class="text-warning">{{investment.get_status_display}}</b></span></li>
+                    <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b class="text-secondary">{{investment.get_status_display}}</b></span></li>
                     {% elif investment.status == 'approved' %}
                     <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b class="text-info">{{investment.get_status_display}}</b></span></li>
                     {% elif investment.status == 'completed' %}
                     <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b class="text-success">{{investment.get_status_display}}</b></span></li>
                     {% endif %}
                 </div>
-                <a href="{% url 'mining:investment_pdf' investment.investment_id %}"><button class="btn btn-primary">View in PDF</button></a>
+                <a href="{% url 'mining:investment_pdf' investment.investment_id %}"><button class="btn btn-info">View in PDF</button></a>
             </div>
         </div>
     </div>

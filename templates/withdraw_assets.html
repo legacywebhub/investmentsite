@@ -25,7 +25,7 @@
                 <nav>
                     <ol class="breadcrumb p-0 m-b-0">
                         <li class="breadcrumb-item">
-                            <a href="#"><i class="ti ti-home"></i></a>
+                            <a href="{% url 'mining:account' %}"><i class="ti ti-home"></i></a>
                         </li>
                         <li class="breadcrumb-item">
                             Withdraw
@@ -46,9 +46,10 @@
         <div class="card card-statistics">
             <div class="card-header">
                 <div class="card-heading">
-                    <h4 class="card-title">Withraw assets</h4>
+                    <h4 class="card-title">Withdraw assets</h4>
                 </div>
                 {% for message in messages %}
+                <br>
                 <p {% if message.tags %}class="{{ message.tags }}"{% endif %}>{{message}}</p>
                 {% endfor %}
             </div>
@@ -97,7 +98,7 @@
                             </optgroup>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary withdraw-submit" name="withdraw-submit">Continue</button>
+                    <button type="submit" class="btn btn-info withdraw-submit" name="withdraw-submit">Continue</button>
                 </form>
             </div>
         </div>

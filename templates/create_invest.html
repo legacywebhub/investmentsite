@@ -48,8 +48,8 @@
             <div class="card-body pricing-content">
                 <div class="pricing-content-card">
                     <h5>{{package.package}}</h5>
-                    <h2 class="text-primary pt-3">{{package.daily_profit_percentage}}%</h2>
-                    <p class="text-primary pb-3">/ DAILY</p>
+                    <h2 class="text-info pt-3">{{package.daily_profit_percentage}}%</h2>
+                    <p class="text-info pb-3">/ DAILY</p>
                     <ul class="py-2">
                         <li>${{package.minimum_amount}} MINIMUM</li>
                         <li>${{package.maximum_amount}} MAXIMUM</li>
@@ -75,7 +75,7 @@
 
                                     <div class='input-group'>
                                         <div class='input-group-prepend'>
-                                            <span class='input-group-text'>$</span>
+                                            <span class='input-group-text bg-info'>$</span>
                                         </div>
                                         <input aria-label='Investment Amount' maxlength="12"  onkeypress="return onlyNumberKey(event)" class='form-control amount' name='amount' type='number' require>
                                         <select class='form-control select2 br-0 bg-light nice-select_154 payment' name='payment' data-placeholder='Choose a payment method' require>
@@ -103,7 +103,7 @@
                                     <strong> Daily profit</strong>
                                     <div class='input-group'>
                                         <div class='input-group-prepend'>
-                                            <span class='input-group-text'>$</span>
+                                            <span class='input-group-text bg-info'>$</span>
                                         </div>
                                         <input class='form-control bl-0 daily-profit' placeholder='' readonly>
                                     </div>
@@ -111,7 +111,7 @@
                                     <strong> Total profit</strong>
                                     <div class='input-group'>
                                         <div class='input-group-prepend'>
-                                            <span class='input-group-text'>$</span>
+                                            <span class='input-group-text bg-info'>$</span>
                                         </div>
                                         <input class='form-control bl-0 total-profit' placeholder='' readonly>
                                     </div>
@@ -120,7 +120,7 @@
                                 <div>
                                     <p class='message error mb-2'></p>
                                     <div class='panel-footer text-center'>
-                                        <button type='submit' class='btn btn-primary invest-button'><span class="btn-text">Purchase Now!</span></button>
+                                        <button type='submit' class='btn btn-info invest-button'><span class="btn-text">Purchase Now!</span></button>
                                     </div>
                                 </div>
 
@@ -138,8 +138,8 @@
             <div class="card-body pricing-content">
                 <div class="pricing-content-card">
                     <h5>Premium</h5>
-                    <h2 class="text-primary pt-3">2.5%</h2>
-                    <p class="text-primary pb-3">/ DAILY</p>
+                    <h2 class="text-info pt-3">2.5%</h2>
+                    <p class="text-info pb-3">/ DAILY</p>
                     <ul class="py-2">
                         <li>$50 MINIMUM</li>
                         <li>$1000 MAXIMUM</li>
@@ -206,7 +206,7 @@
                                 <div>
                                     <p class='response2'></p>
                                     <div class='panel-footer text-center'>
-                                        <button type='submit' onclick='install(this)' class='btn btn-primary' id='invest'>Purchase Now!</button>
+                                        <button type='submit' onclick='install(this)' class='btn btn-info' id='invest'>Purchase Now!</button>
                                     </div>
                                 </div>
 

@@ -1,0 +1,298 @@
+{% extends 'front/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Register | {{company.name}}</title>
+{% endblock %}
+
+{% block content %}
+<section class="hero-section gradient-overlay ptb-100 full-screen">
+  <div class="container">
+    <div class="row align-items-center justify-content-between pt-3 pt-sm-3 pt-md-3 pt-lg-3">
+        <div class="col-md-6 offset-md-3 ">
+          <div class="card login-signup-card shadow-lg mb-0">
+              <div class="card-body px-md-5 py-5">
+                  <div class="mb-5">
+                      <div id="google_translate_element"></div>
+                        <script type="text/javascript">
+                          function googleTranslateElementInit() {
+                              new google.translate.TranslateElement({ p: 'en', layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL}, 'google_translate_element');
+                          }
+                        </script>
+                        <script type="text/javascript" src="{% static 'base/translate.google.com/translate_a/elementa0d8.js?cb=googleTranslateElementInit' %}"></script>
+                        <h6 class="h3">Create account</h6>
+                        <p class="text-muted mb-0">Get a new account in few steps.</p>
+                      </div>
+
+                      <form method='post' name="regform" autocomplete="off">
+                        {% csrf_token %}
+                        <div class="form-group">
+                          <!-- Label -->
+                          <label class="pb-1">
+                            First Name *
+                          </label>
+                          <!-- Input group -->
+                          <div class="input-group input-group-merge">
+                          <div class="input-icon">
+                            <span class="ti-user color-primary"></span>
+                          </div>
+                          <input type="text" maxlength="50" name="firstname" class="form-control" required></div>
+                        </div>
+                                                  
+                        <div class="form-group">
+                          <!-- Label -->
+                          <label class="pb-1">
+                            Last Name *
+                          </label>
+                          <!-- Input group -->
+                          <div class="input-group input-group-merge">
+                            <div class="input-icon">
+                              <span class="ti-email color-primary"></span>
+                            </div>
+                            <input type="text" maxlength="50" name="lastname" class="form-control" required>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <!-- Label -->
+                          <label class="pb-1">
+                              Email Address *
+                          </label>
+                          <!-- Input group -->
+                          <div class="input-group input-group-merge">
+                              <div class="input-icon">
+                                  <span class="ti-email color-primary"></span>
+                              </div>
+                              <input type="text" maxlength="50" name="email" class="form-control" required>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <!-- Label -->
+                          <label class="pb-1">
+                              Password *
+                          </label>
+                          <!-- Input group -->
+                          <div class="input-group input-group-merge">
+                              <div class="input-icon">
+                                  <span class="ti-email color-primary"></span>
+                              </div>
+                              <input type="password" minlength="5" maxlength="20" class="form-control" name="password1" size=30 required >
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <!-- Label -->
+                          <label class="pb-1">
+                          Retype Password *
+                          </label>
+                          <!-- Input group -->
+                          <div class="input-group input-group-merge">
+                              <div class="input-icon">
+                                  <span class="ti-email color-primary"></span>
+                              </div>
+                              <input type="password" minlength="5" maxlength="20" class="form-control" name="password2" size=30 required>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <input type="hidden" maxlength="50" id="location" name="location" class="form-control" size=30>
+                          <input type="hidden" maxlength="50" id="timezone" name="timezone" class="form-control" size=30>
+                        </div>
+
+                        <div class="form-group">
+                          <!-- Label -->
+                          <label class="pb-1">
+                            Referred By
+                          </label>
+                          <!-- Input group -->
+                          <div class="input-group input-group-merge">
+                          {% if upline %}
+                          <input type="text" value="{{upline}}" class="form-control" disabled size=30></div>
+                          <input type="hidden" name="ref-code" value="{{upline.ref_code}}" class="form-control" size=30></div>
+                          {% else %}
+                          <input type="text" name="ref-code" value="" class="form-control" disabled></div>
+                          {% endif %}
+                        </div>
+
+                        <div class="my-4">
+                          <div class="custom-control custom-checkbox mb-3">
+                              <input type="checkbox" class="custom-control-input" name="agree" checked disabled><label class="custom-control-label" > I agree with <a href="{% url 'mining:tac' %}">Terms and conditions</a></label>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <p class="form-msg"></p>
+                        </div>
+                        
+                        <!-- Submit -->
+                        <button type="submit" name="register-submit" class="btn btn-block secondary-solid-btn border-radius mt-4 mb-3 regbtn"><span class="button-text">Sign up</span></button>
+                      </form>
+                    </div>
+                    <div class="card-footer px-md-5 bg-transparent border-top"><small>Already have an account?</small>
+                      <a href="{% url 'mining:login' %}" class="small">Sign in</a>
+                    </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block script %}
+<!-- Script for getting user location from longitude and latitude -->
+<script>
+  let handleResults = (position) => {
+      let {latitude, longitude} = position.coords;
+
+      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=870f0570505b4d4498b7b1d220992532`)
+      .then(response => response.json())
+      .then((data) => {
+          let country =  data.results[0].components.country,
+          state = data.results[0].components.state,
+          userLocation = `${state}`;
+          console.log(userLocation);
+          document.getElementById('location').value = userLocation;
+          localStorage.setItem('location', userLocation);
+      })
+
+  }
+
+  let userlocation = localStorage.getItem('location');
+
+  if (userlocation == null) {
+      // if there is no location in local storage then fetch and set one
+      navigator.geolocation.getCurrentPosition(handleResults, console.log)
+  } else {
+      // else just set our input value
+      console.log(userlocation);
+      document.getElementById('location').value = userlocation;
+  }
+</script>
+<script>
+  // Timezone settings
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // e.g. "America/New_York"
+  document.getElementById('timezone').value = timezone;
+  console.log(document.getElementById('timezone').value);
+</script>
+
+<script>
+// CUSTOM FORM VALIDATION
+  const myForm = document.forms["regform"],
+    email = myForm["email"],
+    firstName = myForm["firstname"],
+    lastName = myForm["lastname"],
+    password1 = myForm["password1"],
+    password2 = myForm["password2"],
+    ref = myForm["ref-code"],
+    formLocation = myForm["location"],
+    checkBox = myForm["agree"],
+    formMessage = document.querySelector(".form-msg"),
+    regBtn = document.querySelector('.regbtn'),
+    url = "{% url 'mining:process_registeration' %}";
+
+  let data = null;
+
+
+  myForm.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    validateForm();
+  })
+
+  // This function validates our form
+  function validateForm() {
+    if (firstName.value.indexOf(" ") > -1) {
+        setError("Name cannot have spaces");
+    } else if (lastName.value.indexOf(" ") > -1) {
+        setError("Name cannot have spaces");
+    }  else if (email.value.indexOf('@') <= 0 || email.value.indexOf('.') <= 0 || email.value.indexOf(" ") > -1) {
+        setError("Enter valid email address");
+    } else {
+      if (password1.value != password2.value) {
+        setError("Passwords do not match");
+      } else if (password1.value.indexOf(" ") > -1 || password2.value.indexOf(" ") > -1) {
+        setError("Passwords do not have spaces");
+      } else {
+        if (!checkBox.checked) {
+          setError("You must accept terms and conditions before proceeding");
+        } else {
+          console.log('successfully validated');
+
+          // Loading animation
+          console.log('About to send data...');
+          let btnText = regBtn.querySelector('.button-text');
+          btnText.innerHTML = `<img src="{% static 'assets/img/loading.gif' %}" width="18" alt="please wait...">`;
+          regBtn.disabled = true;
+
+          console.log(formLocation.value);
+          console.log(timezone);
+
+            data = {
+              'firstname': firstName.value,
+              'lastname': lastName.value,
+              'email': email.value,
+              'password1': password1.value,
+              'password2': password2.value,
+              'location': formLocation.value,
+              'timezone': timezone,
+              'ref-code': ref.value,
+            }
+
+          console.log(data);
+
+          fetch(url, {
+              method: "POST",
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': csrftoken,
+              },
+              body: JSON.stringify(data)
+          })
+          .then((response)=>{
+              return response.json()
+          })
+          .then((data)=>{
+              console.log(data);
+              if (data['status'] == 'success') {
+                  formMessage.classList.add('success'); 
+                  formMessage.innerText = data['message'];
+                  btnText.innerHTML = 'Success';
+                  window.location.href = "{% url 'mining:login' %}"
+              } else {
+                  formMessage.classList.add('error'); 
+                  formMessage.innerText = data['message'];
+                  btnText.innerHTML = `Sign up`;
+                  regBtn.disabled = false;
+                  setTimeout(()=>{
+                      formMessage.innerText = '';
+                  }, 10000)
+              }
+          })
+          .catch((err)=>{
+              console.log(err);
+              formMessage.classList.add('error'); 
+              formMessage.innerText = 'Error while saving';
+              btnText.innerHTML = `Sign up`;
+              regBtn.disabled = false;
+              setTimeout(()=>{
+                  formMessage.innerText = '';
+              }, 5000)
+          })
+      
+        }
+      }
+    }
+  }
+
+  function setError(message){
+    let msgBox = document.querySelector(".form-msg");
+    msgBox.classList.add('error');
+    msgBox.innerText = message;
+
+    setTimeout(()=>{
+      msgBox.innerText = "";
+    }, 10000)
+  }
+</script>
+
+{% endblock %}

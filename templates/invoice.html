@@ -60,7 +60,7 @@
 
 {% block pagetitle %}
 <div class="row">
-    <div class="col-md-12 m-b-30">
+    <div class="col-lg-12 m-b-30">
         <!-- begin page title -->
         <div class="d-block d-lg-flex flex-nowrap align-items-center">
             <div class="page-title mr-4 pr-4 border-right">
@@ -153,12 +153,12 @@
                     </div>
                     {% if investment.status == 'pending' %}
                     <div>
-                        <button class='btn btn-primary' id='confirm-button'><span class="btn-text">Confirm payment</span></button>
+                        <button class='btn btn-info' id='confirm-button'><span class="btn-text">Confirm payment</span></button>
                     </div>
                     {% endif %}
                 </div>
                 {% if investment.status == 'pending' %}
-                <p><button class="btn btn-primary" id="pay-button"><span class="btn-text">Pay from balance</span></button></p><br>
+                <p><button class="btn btn-info" id="pay-button"><span class="btn-text">Pay from balance</span></button></p><br>
                 <p id="message"></p>
                 {% endif %}
             </div>
@@ -201,7 +201,7 @@
                     <li class="invoice-item"><span class="invoice-item-title">PAYMENT METHOD</span> <span class="invoice-result">{{investment.payment_method}}</span></li>
                     <li class="invoice-item"><span class="invoice-item-title">DURATION</span> <span class="invoice-result">{{investment.package.duration_in_days}} DAYS</span></li>
                     {% if investment.status == 'pending' %}
-                    <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b class="text-warning">{{investment.get_status_display}}</b></span></li>
+                    <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b class="text-secondary">{{investment.get_status_display}}</b></span></li>
                     {% elif investment.status == 'approved' %}
                     <li class="invoice-item"><span class="invoice-item-title">STATUS</span> <span class="invoice-result"><b class="text-info">{{investment.get_status_display}}</b></span></li>
                     {% elif investment.status == 'completed' %}

@@ -20,7 +20,7 @@
 
 {% block pagetitle %}
 <div class="row">
-    <div class="col-md-12 m-b-30">
+    <div class="col-lg-12 m-b-30">
         <!-- begin page title -->
         <div class="d-block d-lg-flex flex-nowrap align-items-center">
             <div class="page-title mr-4 pr-4 border-right">
@@ -30,7 +30,7 @@
                 <nav>
                     <ol class="breadcrumb p-0 m-b-0">
                         <li class="breadcrumb-item">
-                            <a href="#"><i class="ti ti-home"></i></a>
+                            <a href="/"><i class="ti ti-home"></i></a>
                         </li>
                         <li class="breadcrumb-item">
                             History
@@ -45,7 +45,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="col-12">
+<div style="min-height: 60vh;">
     <div class="card card-statistics clients-contant">
         <div class="card-header">
             <h3><center>MINING HISTORY</center></h3>
@@ -78,8 +78,8 @@
                         <td>${{investment.total_profit}}</td>
                         <td>${{investment.returns}}</td>
                         {% if investment.status == 'pending' %}
-                        <td class="text-warning">{{investment.status}}</td>
-                        <td><a href="{% url 'mining:investment_detail' investment.investment_id %}" class="btn btn-icon btn-inverse-warning"><i class="ti ti-eye"></i></a></td>
+                        <td class="text-secondary">{{investment.status}}</td>
+                        <td><a href="{% url 'mining:investment_detail' investment.investment_id %}" class="btn btn-icon btn-inverse-secondary"><i class="ti ti-eye"></i></a></td>
                         {% elif investment.status == 'approved' %}
                         <td class="text-info">{{investment.status}}</td>
                         <td><a href="{% url 'mining:investment_detail' investment.investment_id %}" class="btn btn-icon btn-inverse-info"><i class="ti ti-eye"></i></a></td>
@@ -94,7 +94,7 @@
 
             {% if investments %}
             <div class="pagination-container">
-                <div class="pagination-display">
+                <div class="pagination-display mb-2">
                     <div class="dataTables_info" id="datatable_info" role="status" aria-live="polite">Page <b>{{ investments.number }}</b> of <b>{{ investments.paginator.num_pages }}</b></div>
                 </div>
                 <div class="pagination-control">

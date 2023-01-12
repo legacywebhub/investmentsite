@@ -32,56 +32,13 @@ def index(request):
     last_deposits = LastDeposit.objects.all().order_by('-date')[:10]
     last_withdraws = LastWithdraw.objects.all().order_by('-date')[:10]
     contexts = {'company':company, 'packages':packages, 'last_deposits': last_deposits, 'last_withdraws': last_withdraws}
-    return render(request, 'index.html', contexts)
+    return render(request, 'front/index.html', contexts)
 
 
 
 def register(request):
     company = CompanyInfo.objects.last()
-
-    if request.method == "POST":
-        if 'register-submit' in request.POST:
-            email = request.POST['email']
-            first_name = request.POST['first-name']
-            last_name = request.POST['last-name']
-            location = request.POST['location']
-            timezone = request.POST['timezone']
-            password1 = request.POST['password1']
-            password2 = request.POST['password2']
-
-            if password2 == password1:
-                if User.objects.filter(email=email).exists():
-                    messages.error(request, 'Sorry this email has already been taken!')
-                else:
-                    if len(password2) >= 5:
-                        # Saving user and user instances
-                        user = User.objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password2)
-                        user.save()
-                        # On user save, a profile instance is created dynamically from signals.py
-                        # Fetching profile of user created from signals.py to update upliner
-                        profile = Profile.objects.get(user=user)
-                        # Setting timezone of user
-                        profile.timezone = timezone
-                        # Checking if user allowed location
-                        if location != '' or location != ' ':
-                            profile.location = location
-                        profile.save()
-                        # Send success email
-                        try:
-                            html_content = render_to_string('email_welcome.html', {'user':user, 'company':company})
-                            email = EmailMessage(f'{user.first_name}, your account was successfully created', html_content, company.email, [user.email,])
-                            email.content_subtype = 'html'
-                            email.fail_silently = False
-                            email.send()
-                        except Exception as e:
-                            print(e)
-                        messages.success(request, f'{user.first_name}, your account has successfully been created... you can now sign in!')
-                        return redirect('mining:login')
-                    else:
-                        messages.error(request, 'Password length cannot be less than 5')
-            else:
-                messages.error(request, 'Passwords does not match... Please try again')
-    return render(request, 'register.html', {'company':company})
+    return render(request, 'front/register.html', {'company':company})
 
 
 
@@ -90,56 +47,8 @@ def uplineRegister(request, refcode):
         upline = Profile.objects.get(ref_code=refcode)
     except:
         return redirect('mining:register')
-    
     company = CompanyInfo.objects.last()
-
-    if request.method == "POST":
-        if 'register-submit' in request.POST:
-            email = request.POST['email']
-            first_name = request.POST['first-name']
-            last_name = request.POST['last-name']
-            location = request.POST['location']
-            timezone = request.POST['timezone']
-            password1 = request.POST['password1']
-            password2 = request.POST['password2']
-
-            if password2 == password1:
-                if User.objects.filter(email=email).exists():
-                    messages.error(request, 'Sorry this email has already been taken!')
-                else:
-                    if len(password2) >= 5:
-                        # Saving user and user instances
-                        user = User.objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password2)
-                        user.save()
-                        # On user save, a profile instance is created dynamically from signals.py
-                        # Fetching profile of user created from signals.py to update upliner
-                        profile = Profile.objects.get(user=user)
-                        profile.upline = upline.user
-                        # Setting timezone of user
-                        profile.timezone = timezone
-                        # Checking if user allowed location
-                        if location != '' or location != ' ':
-                            profile.location = location
-                        profile.save()
-                        # Updating downlines for upline
-                        upline.downlines.add(user)
-                        upline.save()
-                        # Send success email
-                        try:
-                            html_content = render_to_string('email_welcome.html', {'user':user, 'company':company})
-                            email = EmailMessage(f'{user.first_name}, your account was successfully created', html_content, company.email, [user.email,])
-                            email.content_subtype = 'html'
-                            email.fail_silently = False
-                            email.send()
-                        except Exception as e:
-                            print(e)
-                        messages.success(request, f'{user.first_name}, your account has successfully been created... you can now sign in!')
-                        return redirect('mining:login')
-                    else:
-                        messages.error(request, 'Password length cannot be less than 5... Please try again')
-            else:
-                messages.error(request, 'Passwords does not match... Please try again')
-    return render(request, 'register.html', {'company': company,'upline':upline})
+    return render(request, 'front/register.html', {'company': company,'upline':upline})
 
 
 
@@ -157,7 +66,7 @@ def login(request):
                 return redirect('/account/')
             else:
                 messages.error(request, 'Invalid credentials..   Please try again')
-    return render(request, 'login.html', {'company':company})
+    return render(request, 'front/login.html', {'company':company})
 
 
 
@@ -169,69 +78,44 @@ def logout(request):
 
 def about(request):
     company = CompanyInfo.objects.last()
-    return render(request, 'about.html', {'company':company})
+    return render(request, 'front/about.html', {'company':company})
 
 
 
 def faq(request):
     company = CompanyInfo.objects.last()
-    return render(request, 'faq.html', {'company':company})
+    return render(request, 'front/faq.html', {'company':company})
 
 
 
-def team(request):
+def services(request):
     company = CompanyInfo.objects.last()
-    return render(request, 'team.html', {'company':company})
+    return render(request, 'front/services.html', {'company':company})
 
 
 
 def reviews(request):
     company = CompanyInfo.objects.last()
-    return render(request, 'reviews.html', {'company':company})
+    return render(request, 'front/reviews.html', {'company':company})
 
 
 
 def plans(request):
     company = CompanyInfo.objects.last()
     packages = Package.objects.all()
-    return render(request, 'plans.html', {'company':company, 'packages': packages})
+    return render(request, 'front/plans.html', {'company':company, 'packages': packages})
 
 
 
 def tac(request):
     company = CompanyInfo.objects.last()
-    return render(request, 'tac.html', {'company':company})
+    return render(request, 'front/tac.html', {'company':company})
 
 
 
 def contact(request):
     company = CompanyInfo.objects.last()
-    if request.method == 'POST':
-        if 'message' in request.POST:
-            name = request.POST['name']
-            location = request.POST['location']
-            email = request.POST['email']
-            subject = request.POST['subject']
-            message = request.POST['message']
-
-            try:
-                email.index('@') and email.index('.')
-            except ValueError:
-                messages.info(request, 'Your email is not valid')
-            else:
-                try:
-                    html_content = render_to_string('email_template.html', {'subject':subject, 'message':message, 'company':company})
-                    email = EmailMessage(subject, html_content, email, [company.email, settings.EMAIL_HOST_USER])
-                    email.content_subtype = 'html'
-                    email.fail_silently = False
-                    email.send()
-                    print(f'Message was successfully sent to admins...')
-                except Exception as e:
-                    print(e)
-                message = Message.objects.create(name=name, location=location, email=email, subject=subject, message=message)
-                message.save()
-                messages.success(request, 'Your message was sent successfully')
-    return render(request, 'contact.html', {'company': company})
+    return render(request, 'front/contact.html', {'company': company})
 
 
 
@@ -444,7 +328,7 @@ def withdrawalAssets(request):
                         network=network
                     )
                     withdraw_request.save()
-                    messages.success(request, 'Withdraw request was successsfully placed')
+                    messages.success(request, 'Withdrawal request was successsfully placed')
                 except Exception as e:
                     print(e)
                     messages.error(request, e)
@@ -567,6 +451,118 @@ def error500(request):
 
 
 # Pseudo views
+
+# View to process message request
+def processMessage(request):
+    company = CompanyInfo.objects.last()
+    data = json.loads(request.body)
+    print(data)
+    name = data['name']
+    location = data['location']
+    email = data['email']
+    subject = data['subject']
+    message = data['message']
+
+    try:
+        email.index('@') and email.index('.')
+    except ValueError:
+        response = {
+            'status': 'error',
+            'message': 'Your email is not valid'
+        }
+    else:
+        try:
+            html_content = render_to_string('email_template.html', {'subject':subject, 'message':message, 'company':company})
+            email = EmailMessage(subject, html_content, email, [company.email, settings.EMAIL_HOST_USER])
+            email.content_subtype = 'html'
+            email.fail_silently = False
+            email.send()
+            print('Message sent successfully via email')
+        except Exception as e:
+            print(e)
+        message = Message.objects.create(name=name, location=location, email=email, subject=subject, message=message)
+        message.save()
+        response = {
+            'status': 'success',
+            'message': 'Your message was sent successfully'
+        }
+    return JsonResponse(response, safe=False)
+
+
+# View to process user registeration
+def processRegisteration(request):
+    data = json.loads(request.body)
+    company = CompanyInfo.objects.last()
+    print(data)
+    first_name = data['firstname']
+    last_name = data['lastname']
+    email = data['email']
+    location = data['location']
+    timezone = data['timezone']
+    password1 = data['password1']
+    password2 = data['password2']
+    ref_code = data['ref-code']
+
+
+    if password2 == password1:
+        try:
+            email.index('@') and email.index('.')
+        except ValueError:
+            response = {
+                'status': 'error',
+                'message': 'Your email is not valid'
+            }
+            return JsonResponse(response, safe=False)
+        else:
+            if User.objects.filter(email=email).exists():
+                response = {
+                    'status': 'error',
+                    'message': 'Sorry this email has already been taken!'
+                }
+                return JsonResponse(response, safe=False)
+            else:
+                if len(password2) >= 5:
+                    # Saving user and user instances
+                    user = User.objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password2)
+                    user.save()
+                    # On user save, a profile instance is created dynamically from signals.py
+                    # Fetching profile of user created from signals.py to update upliner
+                    user_profile = Profile.objects.get(user=user)
+                    # Setting timezone and location of user
+                    user_profile.timezone = timezone
+                    # Checking if user allowed location on frontend
+                    if location != '' or location != ' ':
+                        user_profile.location = location
+                    # Referral system
+                    try:
+                        # Checking for referral code
+                        upline = Profile.objects.get(ref_code=ref_code)
+                        # Updating upline for user
+                        user_profile.upline = upline.user
+                        # Updating downlines for upline
+                        upline.downlines.add(user)
+                        upline.save()
+                    except:
+                        print('no referral')
+                    user_profile.save()
+                    # Send success email
+                    try:
+                        html_content = render_to_string('email_welcome.html', {'user':user, 'company':company})
+                        email = EmailMessage(f'{user.first_name}, your account was successfully created', html_content, company.email, [user.email,])
+                        email.content_subtype = 'html'
+                        email.fail_silently = False
+                        email.send()
+                    except Exception as e:
+                        print(e)
+                    response = {'status':'success', 'message': f'{user.first_name}, your account has successfully been created... you can now sign in!'}
+                    return JsonResponse(response, safe=False)
+                else:
+                    response = {'status':'error', 'message': 'Password length cannot be less than 5'}
+                    return JsonResponse(response, safe=False)
+    else:
+        response = {'status':'error', 'message': 'Passwords does not match'}
+        return JsonResponse(response, safe=False)
+
 
 # View to start new mining investment
 def processInvestment(request):

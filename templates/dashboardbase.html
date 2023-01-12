@@ -285,8 +285,8 @@
                             </li>
                             <li class="nav-static-title">Settings</li>
                             <li><a href="{% url 'mining:profile' %}"><i class="ti ti-user"></i><span class="nav-title"> Profile</span></a> </li>
-                            <li><a href="{% url 'mining:affiliates' %}"><i class="ti ti-link"></i><span class="nav-title"> Affiliates</span> <span class="sidebar-count">{{request.user.profile.downlines.all.count}}</span></a> </li>
-                            <li><a href="{% url 'mining:notifications' %}"><i class="ti ti-bell"></i><span class="nav-title"> Notifications</span> <span class="sidebar-count">{{total_notifications}}</span></a></li>
+                            <li><a href="{% url 'mining:affiliates' %}"><i class="ti ti-link"></i><span class="nav-title"> Affiliates</span> <span class="sidebar-count bg-info">{{request.user.profile.downlines.all.count}}</span></a> </li>
+                            <li><a href="{% url 'mining:notifications' %}"><i class="ti ti-bell"></i><span class="nav-title"> Notifications</span> <span class="sidebar-count bg-info">{{total_notifications}}</span></a></li>
                             <li><a href="{% url 'mining:logout' %}"><i class="ti ti-power-off"></i><span class="nav-title"> Logout</span></a></li>
                         </ul>
                     </div>
@@ -317,7 +317,7 @@
                         <p>&copy; Copyright 2019. All rights reserved.</p>
                     </div>
                     <div class="col  col-sm-6 ml-sm-auto text-center text-sm-right">
-                        <p>mywebsite.com</p>
+                        <p>{{company.site_domain}}</p>
                     </div>
                 </div>
             </footer>
